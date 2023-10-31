@@ -1,0 +1,9 @@
+<h1>Mocha</h1>
+<form action="{% url 'add' %}" method="post">
+    {% csrf_token %}
+    <label for="condiments">Condiments: </label>
+    <input type="checkbox" name="condiments" value="mocha"> Mocha
+    <input type="checkbox" name="condiments" value="whip"> Whip
+    <input type="checkbox" name="condiments" value="soy"> Soy
+    <button type="submit">Add Condiments</button>
+</form>
