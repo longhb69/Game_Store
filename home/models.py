@@ -11,6 +11,35 @@ CATEGORY = {
     'Brewed Tea': 'Brewed Tea',
 }
 
+class Drink(models.Model):
+    description = models.CharField(max_length=200,default=None)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.description
+
+class Topping(models.Model):
+    name = models.CharField(max_length=50)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return self.name
+
+class ToppedDrink(models.Model):
+    beverage = models.ForeignKey(Drink, on_delete=models.CASCADE, default=None)
+    toppings = models.ManyToManyField(Topping, related_name="drinks", blank=True)
+
+    def add_topping(self, topping):
+        self.toppings.add(topping)
+        self.save()
+
+    def cost(self):
+        # Calculate the total cost of the drink with added toppings
+        base_cost = self.beverage.cost
+        topping_cost = sum(topping.price for topping in self.toppings.all())
+        return base_cost + topping_cost
+
+
 @six.add_metaclass(ABCMeta)
 class Beverage(object):
     description = ''

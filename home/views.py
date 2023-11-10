@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Espresso, HouseBlend, Mocha, Whip, Soy
+from .models import Espresso, HouseBlend, Mocha, Whip, Soy,Drink,ToppedDrink,Topping
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 
@@ -14,6 +14,14 @@ condiment_mapping = {
 }
 
 def index(request):
+    drink = Drink.objects.get(description = "Espesso")
+    topping = Topping.objects.get(name="milk")
+    topping2 = Topping.objects.get(name="mocha")
+    test = ToppedDrink.objects.create(beverage = drink)
+    test.add_topping(topping)
+    test.add_topping(topping2)
+
+    print(test.cost())
     return render(request, "home/inbox.html")
 
 def add(request):
