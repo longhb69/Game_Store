@@ -2,6 +2,10 @@ from django.db import models
 from abc import ABCMeta
 import six
 
+#don't forget to specity app path. For example:
+#python manage.py makemigrations app
+#python manage.py migrate app
+
 class Category(models.Model):
     name = models.CharField(max_length=200, default=None)
     
@@ -12,11 +16,13 @@ CATEGORY = {
 }
 
 class Drink(models.Model):
-    description = models.CharField(max_length=200,default=None)
+    name = models.CharField(max_length=200,default=None,null=True)
+    description = models.CharField(max_length=2000, default=None,null=True, blank=True)
+    image = models.ImageField(upload_to="drinkimage",default=None,blank=True, null=True)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return self.description
+        return self.name
 
 class Topping(models.Model):
     name = models.CharField(max_length=50)

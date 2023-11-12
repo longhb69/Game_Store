@@ -1,9 +1,16 @@
-<h1>Mocha</h1>
-<form action="{% url 'add' %}" method="post">
+{% for drink in drinks%}
+   <h2 >{{drink.name}}</h2>
+   <h1>{{drink.description}}</h1>
+   <img src={{drink.image}}></img>
+   <form action="{% url 'add' %}" method="post">
     {% csrf_token %}
+    
     <label for="condiments">Condiments: </label>
+    <input type="hidden" name="drink_name" value="{{ drink.name }}">
     <input type="checkbox" name="condiments" value="mocha"> Mocha
     <input type="checkbox" name="condiments" value="whip"> Whip
     <input type="checkbox" name="condiments" value="soy"> Soy
+    <input type="checkbox" name="condiments" value="milk"> Milk
     <button type="submit">Add Condiments</button>
 </form>
+{% endfor %}

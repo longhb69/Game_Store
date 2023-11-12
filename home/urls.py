@@ -16,8 +16,13 @@ Including another URLconf
 """
 from django.urls import include,path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+from .views import DrinkView
 
 urlpatterns = [
-   path("", views.index, name="index"),
+   path("test", views.index, name="index"),
+   path("", DrinkView.as_view(), name="drink-view"),
    path("add", views.add, name="add"),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
