@@ -48,7 +48,7 @@ def add(request):
             if Topping.objects.filter(name=condiment).exists():
                 topping = Topping.objects.get(name=condiment)
                 toppeddrink.add_topping(topping)
-                print(toppeddrink.cost())
+                print(toppeddrink.cost)
         return render(request, "home/orderfrom.html", {
             "drink": toppeddrink
         })

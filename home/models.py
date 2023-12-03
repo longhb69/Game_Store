@@ -22,7 +22,10 @@ class Drink(models.Model):
     cost = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return self.name
+        return self.name    
+    
+    
+    
 
 class Topping(models.Model):
     name = models.CharField(max_length=50)
@@ -35,15 +38,34 @@ class ToppedDrink(models.Model):
     beverage = models.ForeignKey(Drink, on_delete=models.CASCADE, default=None)
     toppings = models.ManyToManyField(Topping, related_name="drinks", blank=True)
 
+    #@property ToppedDrink.add_topping = 'macha'
     def add_topping(self, topping):
         self.toppings.add(topping)
         self.save()
-
+        
+    @property
     def cost(self):
         # Calculate the total cost of the drink with added toppings
         base_cost = self.beverage.cost
         topping_cost = sum(topping.price for topping in self.toppings.all())
         return base_cost + topping_cost
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @six.add_metaclass(ABCMeta)
