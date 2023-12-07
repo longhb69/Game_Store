@@ -23,6 +23,6 @@ from .views import DrinkView
 urlpatterns = [
    path("test", views.index, name="index"),
    path("", DrinkView.as_view(), name="drink-view"),
-   path("add", views.add, name="add"),
+   #path("add", views.add, name="add"),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
