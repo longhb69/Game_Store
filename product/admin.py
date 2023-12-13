@@ -1,8 +1,7 @@
 from django.contrib import admin
-from .models import Drink,Topping,Decorator,Category, Size
+from .models import Category,Game,DLC,Decorator
 
-admin.site.register(Drink)
-admin.site.register(Topping)
-admin.site.register(Decorator)
 admin.site.register(Category)
-admin.site.register(Size)
+admin.site.register(Game)
+admin.site.register(DLC)
+admin.site.register(Decorator)
