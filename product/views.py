@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Category,Game,DLC,Decorator
+from .models import Category,Game,DLC,ProductDecorator
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.urls import reverse
 from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer
@@ -35,10 +35,10 @@ class CategoryMixinView(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
 def index(request):
-    game = Game.objects.get(name = "Grand Theft Auto V")
-    dlc = DLC.objects.get(name="Cyberpunk 2077: Phantom Liberty")
-    dlc2 = DLC.objects.get(name="test")
-    test = Decorator.objects.create(game = game)
+    game = Game.objects.get(name = "Alan Wake 2")
+    dlc = DLC.objects.get(name="Alan Wake 2 Deluxe Upgrade")
+    test = ProductDecorator.objects.get(game = game)
+    #test.delete_dlc(dlc)
     test.add_dlc(dlc)
     print(test.get_cost())
     return render(request, "home/inbox.html")

@@ -4,6 +4,9 @@ from django.db import models
 from abc import ABCMeta,ABC, abstractmethod
 from django.utils.text import slugify
 from unidecode import unidecode 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 #import six
 
@@ -34,7 +37,7 @@ class Item(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=3,default=0,null=True,blank=True)
     
     def __str__(self):
-        return self.name
+        return self.name if self.name else "no name"
     
     def get_cost(self):
         return self.price
@@ -48,21 +51,16 @@ class Item(models.Model):
         
     class Meta:
         abstract = True
-    
-class DecoratorManager(models.Manager):
-    def create(self, game, **kwargs):
-        kwargs.setdefault('name', game.get_Description())
-        kwargs.setdefault('price', game.get_cost())
         
-        decorator_instance = super().create(game=game, **kwargs)
-        return decorator_instance
-    
 class Game(Item,Slug):
     overview_description = models.TextField(null=True, blank=True)
     detail_description = models.TextField(null=True, blank=True)
     image = CloudinaryField('image', null=True,blank=True)
+    cover = CloudinaryField('cover', null=True,blank=True)
     video = CloudinaryField(resource_type='video', null=True,blank=True)
     category = models.ManyToManyField(Category)
+    year = models.DateField(null=True,blank=True)
+    
     os_min = models.CharField(max_length=50, verbose_name='Minimum OS', null=True, blank=True)
     os_rec = models.CharField(max_length=50, verbose_name='Recommended OS', null=True, blank=True)
 
@@ -72,14 +70,15 @@ class Game(Item,Slug):
     memory_min = models.CharField(max_length=20, verbose_name='Minimum Memory', null=True, blank=True)
     memory_rec = models.CharField(max_length=20, verbose_name='Recommended Memory', null=True, blank=True)
 
-    storage_min = models.CharField(max_length=20, verbose_name='Minimum Storage', null=True, blank=True)
-    storage_rec = models.CharField(max_length=20, verbose_name='Recommended Storage', null=True, blank=True)
+    storage_min = models.CharField(max_length=50, verbose_name='Minimum Storage', null=True, blank=True)
+    storage_rec = models.CharField(max_length=50, verbose_name='Recommended Storage', null=True, blank=True)
 
     directx_min = models.CharField(max_length=10, verbose_name='Minimum DirectX', null=True, blank=True)
     directx_rec = models.CharField(max_length=10, verbose_name='Recommended DirectX', null=True, blank=True)
 
     graphics_min = models.CharField(max_length=100, verbose_name='Minimum Graphics', null=True, blank=True)
     graphics_rec = models.CharField(max_length=100, verbose_name='Recommended Graphics', null=True, blank=True)
+    
 
 
 class DLC(Item,Slug):
@@ -87,11 +86,20 @@ class DLC(Item,Slug):
     overview_description = models.TextField(null=True, blank=True)
     detail_description = models.TextField(null=True, blank=True)
     image = CloudinaryField('image', null=True,blank=True)
+    cover = CloudinaryField('cover', null=True,blank=True)
     video = CloudinaryField(resource_type='video', null=True,blank=True)
     
-class Decorator(Item):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, default=None)
-    dlcs = models.ManyToManyField(DLC, blank=True)
+class DecoratorManager(models.Manager):
+    def create(self, game, **kwargs):
+        kwargs.setdefault('name', game.get_Description())
+        kwargs.setdefault('price', game.get_cost())
+        
+        decorator_instance = super().create(game=game, **kwargs)
+        return decorator_instance
+    
+class ProductDecorator(Item):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, default=None,related_name='game')
+    dlcs = models.ManyToManyField(DLC, blank=True,related_name='dlcs')
     
     objects = DecoratorManager()   
     
@@ -100,7 +108,17 @@ class Decorator(Item):
         new_cost = self.price + dlc.get_cost()
         self.set_cost(new_cost)
         self.save()
+    def delete_dlc(self,dlc):
+        self.dlcs.remove(dlc)
+        new_cost = self.price - dlc.get_cost()
+        self.set_cost(new_cost)
+        self.save()
         
+from cart.models import CartItem
+@receiver(post_save, sender=ProductDecorator)
+def update_when_add_or_delete_product(sender,instance,*args,**kwargs):
+    cart_item = CartItem.objects.get(product=instance)
+    cart_item.save()
         
     # #@property
     # def get_cost(self):

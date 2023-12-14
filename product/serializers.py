@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import reverse
-from .models import Category,Game,DLC
+from .models import Category,Game,DLC,ProductDecorator
 
 class CategorySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
@@ -16,14 +16,17 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
+    cover = serializers.SerializerMethodField(read_only=True)
     category = CategorySerializer(many=True,read_only=True)
     class Meta:
         model = Game
         fields = [
-            'pk',
+            'id',
             'name',
+            'slug',
             'price',
             'image',
+            'cover',
             'video',
             'category',
         ]
@@ -31,19 +34,32 @@ class GameSerializer(serializers.ModelSerializer):
         return instance.image.url if instance.image else None
     def get_video(self, instance):
         return instance.video.url if instance.video else None
+    def get_cover(self, instance):
+        return instance.cover.url if instance.cover else None
     
 class DLCSerializer(serializers.ModelSerializer):
+    cover = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = DLC
         fields = [
+            'id',
             'name',
+            'cover',
             'price',
             'slug',
         ]
+    def get_cover(self, instance):
+        if hasattr(instance, 'cover'):
+            return instance.cover.url if instance.cover else None
+        elif instance.exists():
+            return instance[0].cover.url if instance[0].cover else None
+        else:            
+            return None
     
 class GameDetailSerializer(serializers.ModelSerializer):
     video =  serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField(read_only=True)
+    cover = serializers.SerializerMethodField(read_only=True)
     category = CategorySerializer(many=True,read_only=True)
     dlc = DLCSerializer(many=True, read_only=True, source='dlcs')
     class Meta:
@@ -53,6 +69,8 @@ class GameDetailSerializer(serializers.ModelSerializer):
         return instance.image.url if instance.image else None
     def get_video(self, instance):
         return instance.video.url if instance.video else None
+    def get_cover(self, instance):
+        return instance.cover.url if instance.cover else None
     
     def to_representation(self, instance):
         if isinstance(instance,DLC):
@@ -102,7 +120,34 @@ class DLCDetailSerializer(serializers.ModelSerializer):
     def get_detail(self, instance):
         game_serializers = GameMetaDetailsSerializer(instance.game)
         return game_serializers.data
-        
+
+class ProductDecoratorSerializer(serializers.ModelSerializer):
+    game = GameSerializer()
+    dlc = DLCSerializer(many=True, read_only=True,source='dlcs')
+    class Meta:
+        model = ProductDecorator
+        fields = [
+            'game',
+            'dlc',
+        ]
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        game_data = {
+            key: representation['game'][key] for key in ['id', 'name', 'cover','slug', 'price', 'image'] 
+        }
+        transformed_representation = {
+            'game': {
+                "id": game_data["id"],
+                "name" : game_data["name"],
+                'cover': game_data["cover"],
+                "price": game_data["price"],
+            },
+            'dlc': representation['dlc']
+        }
+        return transformed_representation
+    
+
+
 
 
 
