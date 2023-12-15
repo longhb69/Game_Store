@@ -8,7 +8,9 @@ urlpatterns = [
     path('api/game/', views.game_alt_view, name='game-list'),
     path('api/game/<str:slug>/', views.game_alt_view,name='game-detail'),
     path('api/dlc/<str:slug>/', views.dlc_alt_view,name='dlc-detail'),
+    
 ]
+
 
 
 

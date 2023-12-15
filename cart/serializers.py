@@ -1,24 +1,30 @@
 from rest_framework import serializers
 from .models import *
-from product.serializers import ProductDecoratorSerializer
+from product.models import ProductDecorator,SpecialEditionGame
+from product.serializers import ProductDecoratorSerializer,SpecialEditionGameSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductDecoratorSerializer(read_only=True)
+    product = serializers.SerializerMethodField()
     class Meta:
         model = CartItem
         fields = [
             'pk',
             'product',
         ]
+    def get_product(self,instance):
+        if isinstance(instance.product,ProductDecorator):
+            return ProductDecoratorSerializer(instance.product).data
+        elif isinstance(instance.product,SpecialEditionGame):
+            return SpecialEditionGameSerializer(instance.product).data
 
 class CartSerializer(serializers.ModelSerializer):
-    cart_items = ProductDecoratorSerializer(many=True,source='items')
+    items = CartItemSerializer(many=True, source='cart_items') 
     class Meta:
         model = Cart
         fields = [
+            'pk',
             'user',
             'ordered',
-            'cart_items',
+            'items',
             'total_price',
         ]
-
