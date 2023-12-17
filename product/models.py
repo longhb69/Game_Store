@@ -37,6 +37,7 @@ class Item(models.Model):
     def __str__(self):
         return self.name if self.name else "no name"
     
+    @property
     def get_cost(self):
         return self.price
     

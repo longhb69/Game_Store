@@ -51,11 +51,15 @@ class DLCSerializer(serializers.ModelSerializer):
 
 class SpecialEditionGameSerializer(serializers.ModelSerializer):
     cover = serializers.SerializerMethodField(read_only=True)
+    base_game = serializers.SerializerMethodField()
+    base_game_id =serializers.SerializerMethodField()
     class Meta:
         model = SpecialEditionGame
         fields = [
             'id',
             'name',
+            'base_game',
+            'base_game_id',
             'cover',
             'price',
             'slug',
@@ -69,7 +73,10 @@ class SpecialEditionGameSerializer(serializers.ModelSerializer):
         #     return instance[0].cover.url if instance[0].cover else None
         else:            
             return None
-    
+    def get_base_game(self, instance):
+        return instance.base_game.get_Description()
+    def get_base_game_id(self, instance):
+        return instance.base_game.id
     
 class GameDetailSerializer(serializers.ModelSerializer):
     video =  serializers.SerializerMethodField(read_only=True)
@@ -134,22 +141,17 @@ class DLCDetailSerializer(serializers.ModelSerializer):
         return game_serializers.data
 
 class SpecialEditionGameDetailSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField(read_only=True)
-    cover = serializers.SerializerMethodField(read_only=True)
-    category = CategorySerializer(many=True,read_only=True)
-    dlc = DLCSerializer(many=True, read_only=True, source='dlcs')
+    dlcs = DLCSerializer(many=True, read_only=True)
     class Meta:
         model = SpecialEditionGame
-        fields = '__all__'
-    def get_image(self, instance):
-        return instance.image.url if instance.image else None
-    def get_video(self, instance):
-        return instance.video.url if instance.video else None
-    def get_cover(self, instance):
-        return instance.cover.url if instance.cover else None
+        fields = [
+            'id',
+            'name',
+            'slug',
+            'price',
+            'dlcs',
+        ]
     
-
-
 class ProductDecoratorSerializer(serializers.ModelSerializer):
     game = GameSerializer()
     dlc = DLCSerializer(many=True, read_only=True,source='dlcs')

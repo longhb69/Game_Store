@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from product.models import ProductDecorator,SpecialEditionGame
+from product.models import ProductDecorator,SpecialEditionGame,DLC
 from django.dispatch import receiver
 from django.db.models.signals import post_save,pre_save,post_delete
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -14,7 +14,7 @@ class Cart(models.Model):
     
     def __str__(self):
         return f"{self.user.username} cart"
-
+    
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
     content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
@@ -25,6 +25,48 @@ class CartItem(models.Model):
     
     def __str__(self):
         return f"{self.cart} - {self.product}"
+    
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True,null=True)
+    date_orderd = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False, null=True,blank=True)
+    transaction_id = models.CharField(max_length=200,null=True)
+    
+    def __str__(self):
+        return str(self.user) + ' order'
+    @property
+    def get_order_total(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.get_total for item in orderitems])
+        return total
+
+class OrderItem(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
+    object_id = models.PositiveIntegerField()
+    product = GenericForeignKey('content_type', 'object_id')
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL,blank=True,null=True)
+    
+    def __str__(self):
+        return self.product.name
+    @property
+    def get_total(self):
+        return self.product.get_cost
+    
+    
+class ShippingAddress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
+    address = models.CharField(max_length=200,blank=True,null=True)
+    city = models.CharField(max_length=200,blank=True,null=True)
+    province = models.CharField(max_length=200,blank=True,null=True)
+    
+    def __str__(self):
+        return self.address
+
+
+#cart.cartitem_set.all()
+#query child object by parent value    
+
         
 
 
@@ -42,9 +84,12 @@ def pre_save_cart_item(sender, instance, **kwargs):
     if instance.content_type is not None and instance.object_id is not None:
         product = instance.content_type.get_object_for_this_type(id=instance.object_id)
         if isinstance(product, ProductDecorator):
-            instance.price = product.price
+            instance.price = product.price + sum(dlc.get_cost for dlc in product.dlcs.all())
         if isinstance(product, SpecialEditionGame):
             instance.price = product.price
+        if isinstance(product, DLC):
+            instance.price = product.get_cost
+    
 
 @receiver(post_save, sender=CartItem)
 def add_price_cart_item(sender, instance, created, *args,**kwargs):
@@ -67,6 +112,7 @@ def update_cart_total_price(sender, instance, **kwargs):
     cart.total_price = total_price 
     cart.save()
     
+
     
     
 

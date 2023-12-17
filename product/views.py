@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import Category,Game,DLC,ProductDecorator
+from .models import Category,Game,DLC,ProductDecorator,SpecialEditionGame
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.urls import reverse
-from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer
+from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer,SpecialEditionGameDetailSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
@@ -48,9 +48,12 @@ def game_alt_view(request, slug=None, *args, **kwargs):
     method = request.method
     if method == "GET":
         if slug is not None:
-            print(slug)
-            obj = get_object_or_404(Game, slug=slug)
-            data = GameDetailSerializer(obj,many=False).data
+            try:
+                obj = get_object_or_404(Game, slug=slug)
+                data = GameDetailSerializer(obj,many=False).data
+            except:
+                obj = get_object_or_404(SpecialEditionGame, slug=slug)
+                data = SpecialEditionGameDetailSerializer(obj,many=False).data
             return Response(data)
         queryset = Game.objects.all()
         data = GameSerializer(queryset, many=True).data

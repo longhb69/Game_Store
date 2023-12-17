@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import *
-from product.models import ProductDecorator,SpecialEditionGame
-from product.serializers import ProductDecoratorSerializer,SpecialEditionGameSerializer
+from product.models import ProductDecorator,SpecialEditionGame,DLC
+from product.serializers import ProductDecoratorSerializer,SpecialEditionGameSerializer,DLCSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = serializers.SerializerMethodField()
@@ -16,6 +16,8 @@ class CartItemSerializer(serializers.ModelSerializer):
             return ProductDecoratorSerializer(instance.product).data
         elif isinstance(instance.product,SpecialEditionGame):
             return SpecialEditionGameSerializer(instance.product).data
+        elif isinstance(instance.product,DLC):
+            return DLCSerializer(instance.product).data
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, source='cart_items') 
