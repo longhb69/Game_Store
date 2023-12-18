@@ -5,7 +5,12 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save,pre_save,post_delete
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from typing import Protocol
 
+
+class Command(Protocol):
+    def execute(self) -> None:
+        ...
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -15,6 +20,17 @@ class Cart(models.Model):
     def __str__(self):
         return f"{self.user.username} cart"
     
+    #item is ProductDecorator,SpecialEditionGame,DLC instance
+    def add_item(self, item):
+        cart_item = CartItem(cart=self,
+                             content_type=ContentType.objects.get_for_model(item),
+                             object_id=item.id)
+        cart_item.save()
+    
+    #item is CartItem instance
+    def delet_item(self, item):
+        item.delete()
+        
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
     content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
@@ -53,23 +69,6 @@ class OrderItem(models.Model):
         return self.product.get_cost
     
     
-class ShippingAddress(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
-    address = models.CharField(max_length=200,blank=True,null=True)
-    city = models.CharField(max_length=200,blank=True,null=True)
-    province = models.CharField(max_length=200,blank=True,null=True)
-    
-    def __str__(self):
-        return self.address
-
-
-#cart.cartitem_set.all()
-#query child object by parent value    
-
-        
-
-
 @receiver(post_save, sender=User)
 def create_user_cart(sender, instance, created, *args,**kwargs):
     if created:
@@ -111,14 +110,10 @@ def update_cart_total_price(sender, instance, **kwargs):
     total_price = sum(cart_item.price for cart_item in cart_items)
     cart.total_price = total_price 
     cart.save()
-    
-
-    
-    
-
-    
-
 
 # In a Django model, the Command Pattern might not be implemented explicitly in the same way as in a general Python application. However, you can structure your Django models and views in a way that follows similar principles. 
 # Django itself uses an MVC (Model-View-Controller) architecture, 
 # and you can leverage this architecture to create a separation of concerns similar to the Command Pattern.
+
+
+    

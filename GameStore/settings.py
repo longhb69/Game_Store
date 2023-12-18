@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "product",
     "cart",
+    'account',
     "cloudinary",
     "corsheaders",
 ]

@@ -11,6 +11,8 @@ from rest_framework.decorators import api_view
 import datetime
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
+from .command import  AddToCartCommand,RemoveFromCartCommand
+from .controller import CartController
 
 
 
@@ -23,7 +25,7 @@ class CartView(APIView):
         #serializer = ProductDecoratorSerializer(test, many=False).data
         return Response(serializer)
     
-    #{"special": false,"game_id":1,"cart_id":2}
+    #{"special": false,"dlc":true,"game_id":2,"cart_id":2}
     def post(self, request, *args, **kwargs):
         special = request.data.get('special')
         dlc = request.data.get('dlc')
@@ -32,27 +34,19 @@ class CartView(APIView):
         
         cart = get_object_or_404(Cart,pk=cart_id)            
         if dlc: 
-            cart_item_content_type = ContentType.objects.get_for_model(DLC)
+            #cart_item_content_type = ContentType.objects.get_for_model(DLC)
+            product = get_object_or_404(DLC,pk=game_id)
         elif special:
-            cart_item_content_type = ContentType.objects.get_for_model(SpecialEditionGame)
+            product = get_object_or_404(SpecialEditionGame, pk=game_id)
         else:
-            cart_item_content_type = ContentType.objects.get_for_model(ProductDecorator)
-        
+            product = get_object_or_404(ProductDecorator, pk=game_id)
         try:
-            cart_item = CartItem.objects.create(cart=cart, 
-                                                content_type=cart_item_content_type,
-                                                object_id=game_id
-                                                )
+            cart_item = CartItem.objects.create(cart=cart,  product=product)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
         return JsonResponse({'message': 'CartItem created successfully'}, status=201)
-        # serializer = CartItemSerializer(data=request.data)
-        # if serializer.is_valid():
-        #     serializer.save()
-        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # else:
-        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     def delete(self, request, *args, **kwargs):
         item_pk = kwargs.get('item_pk')
         cart_item = CartItem.objects.get(pk=item_pk)
@@ -76,10 +70,19 @@ def delete_dlc_in_cart(requset, *args, **kwargs):
     cart_item.save()
     return Response(' ')
 
+
+
 def checkout(request):
+    # user = User.objects.get(username="long1")
+    # transaction_id = datetime.datetime.now().timestamp()
+    # order, created = Order.objects.get_or_create(user=user)
+    # order_item = OrderItem.objects.get(pk=1)
+    # print(order.get_order_total)
+    #dlc = CartItem.objects.get(pk=3)
+    #game = CartItem.objects.get(pk=10)
+    game = SpecialEditionGame.objects.get(pk=1) 
     user = User.objects.get(username="long1")
-    transaction_id = datetime.datetime.now().timestamp()
-    order, created = Order.objects.get_or_create(user=user)
-    order_item = OrderItem.objects.get(pk=1)
-    print(order.get_order_total)
+    cart = Cart.objects.get(user=user)
+    controller = CartController()
+    controller.Invoke(AddToCartCommand(cart=cart, item=game))
     return render(request, "home/inbox.html")
