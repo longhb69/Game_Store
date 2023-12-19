@@ -11,8 +11,8 @@ from rest_framework.decorators import api_view
 import datetime
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
-from .command import  AddToCartCommand,RemoveFromCartCommand
-from .controller import CartController
+from .command import  AddToCartCommand,RemoveFromCartCommand,AddToOrderCommand,RemoveFromOrderCommand
+from .controller import CartController,OrderController
 
 
 
@@ -73,16 +73,29 @@ def delete_dlc_in_cart(requset, *args, **kwargs):
 
 
 def checkout(request):
-    # user = User.objects.get(username="long1")
+    user = User.objects.get(username="long1")
     # transaction_id = datetime.datetime.now().timestamp()
-    # order, created = Order.objects.get_or_create(user=user)
-    # order_item = OrderItem.objects.get(pk=1)
-    # print(order.get_order_total)
+    cart = Cart.objects.get(user=user)
+    order, created = Order.objects.get_or_create(user=user)
+    cart_items = CartItem.objects.filter(cart=cart)
+    controller = OrderController()
+    for product in cart_items:
+        item = get_object_or_404(product.content_type.model_class(), pk=product.object_id)
+        controller.execute(AddToOrderCommand(order,item))
+        
+    print(order.get_order_total)
     #dlc = CartItem.objects.get(pk=3)
     #game = CartItem.objects.get(pk=10)
-    game = SpecialEditionGame.objects.get(pk=1) 
+    return render(request, "home/inbox.html")
+
+def test(request):
     user = User.objects.get(username="long1")
     cart = Cart.objects.get(user=user)
-    controller = CartController()
-    controller.Invoke(AddToCartCommand(cart=cart, item=game))
+    order, created = Order.objects.get_or_create(user=user)
+    product = OrderItem.objects.filter(order=order).first()
+    item = get_object_or_404(product.content_type.model_class(), pk=product.object_id)
+    command = RemoveFromOrderCommand(order,item)
+    command.execute()
     return render(request, "home/inbox.html")
+
+

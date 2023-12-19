@@ -14,8 +14,11 @@ class SpecialEditionGameAdmin(admin.ModelAdmin):
         content_type = ContentType.objects.get_for_model(obj)
         return content_type.model
 
+class DLCAdmin(admin.ModelAdmin):
+    list_display = ['name','id']
+
 admin.site.register(Category)
 admin.site.register(Game)
-admin.site.register(DLC)
+admin.site.register(DLC,DLCAdmin)
 admin.site.register(ProductDecorator,ProductDecoratorAdmin)
 admin.site.register(SpecialEditionGame,SpecialEditionGameAdmin)

@@ -6,6 +6,7 @@ from django.db.models.signals import post_save,pre_save,post_delete
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from typing import Protocol
+from django.shortcuts import get_object_or_404
 
 
 class Command(Protocol):
@@ -28,7 +29,7 @@ class Cart(models.Model):
         cart_item.save()
     
     #item is CartItem instance
-    def delet_item(self, item):
+    def delete_item(self, item):
         item.delete()
         
 class CartItem(models.Model):
@@ -53,8 +54,23 @@ class Order(models.Model):
     @property
     def get_order_total(self):
         orderitems = self.orderitem_set.all()
+        for item in orderitems:
+            print(item.product.get_cost)
         total = sum([item.get_total for item in orderitems])
         return total
+    
+    def add_item(self, item):
+        cart_item = OrderItem(order=self,
+                             content_type=ContentType.objects.get_for_model(item),
+                             object_id=item.id)
+        cart_item.save()
+        
+    #item is OrderItem
+    def delete_item(self, item):
+        content_type = ContentType.objects.get_for_model(item)
+        product = OrderItem.objects.get(order=self,content_type=content_type, object_id=item.pk)
+        product.delete()
+    
 
 class OrderItem(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
@@ -67,6 +83,12 @@ class OrderItem(models.Model):
     @property
     def get_total(self):
         return self.product.get_cost
+
+class CheckoutStep(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    step_number = models.PositiveIntegerField()
+    #payment details
+
     
     
 @receiver(post_save, sender=User)
@@ -111,9 +133,11 @@ def update_cart_total_price(sender, instance, **kwargs):
     cart.total_price = total_price 
     cart.save()
 
-# In a Django model, the Command Pattern might not be implemented explicitly in the same way as in a general Python application. However, you can structure your Django models and views in a way that follows similar principles. 
-# Django itself uses an MVC (Model-View-Controller) architecture, 
-# and you can leverage this architecture to create a separation of concerns similar to the Command Pattern.
+
+
+
+
+
 
 
     

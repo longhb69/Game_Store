@@ -1,7 +1,27 @@
 from dataclasses import dataclass
-from .models import Cart,CartItem
+from .models import Cart,CartItem,Order,OrderItem
 from typing import Union
 from product.models import SpecialEditionGame,DLC,ProductDecorator
+
+
+@dataclass 
+class AddToOrderCommand:
+    order: Order
+    item: Union[SpecialEditionGame,DLC,ProductDecorator]
+    
+    def execute(self):
+        self.order.add_item(item=self.item)
+        
+@dataclass
+class RemoveFromOrderCommand:
+    order: Order
+    item: Union[SpecialEditionGame,DLC,ProductDecorator]
+    
+    def execute(self):
+        self.order.delete_item(item=self.item)
+
+
+
 
 
 
