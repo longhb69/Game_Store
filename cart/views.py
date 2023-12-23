@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view
 import datetime
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
-from .command import  AddToCartCommand,RemoveFromCartCommand,AddToOrderCommand,RemoveFromOrderCommand
+from .command import  AddToCartCommand,RemoveFromCartCommand,AddToOrderCommand,RemoveFromOrderCommand,CreateOrderCommand, DeleteOrderCommand
 from .controller import CartController,OrderController
 
 
@@ -77,25 +77,25 @@ def checkout(request):
     # transaction_id = datetime.datetime.now().timestamp()
     cart = Cart.objects.get(user=user)
     order, created = Order.objects.get_or_create(user=user)
-    cart_items = CartItem.objects.filter(cart=cart)
+    items = CartItem.objects.filter(cart=cart)
     controller = OrderController()
-    for product in cart_items:
-        item = get_object_or_404(product.content_type.model_class(), pk=product.object_id)
-        controller.execute(AddToOrderCommand(order,item))
-        
+    controller.execute(AddToOrderCommand(order,items))
+    #controller.execute(RemoveFromOrderCommand(order))
     print(order.get_order_total)
-    #dlc = CartItem.objects.get(pk=3)
-    #game = CartItem.objects.get(pk=10)
     return render(request, "home/inbox.html")
 
 def test(request):
+    controller = OrderController()
     user = User.objects.get(username="long1")
     cart = Cart.objects.get(user=user)
-    order, created = Order.objects.get_or_create(user=user)
-    product = OrderItem.objects.filter(order=order).first()
-    item = get_object_or_404(product.content_type.model_class(), pk=product.object_id)
-    command = RemoveFromOrderCommand(order,item)
-    command.execute()
+    transaction_id = datetime.datetime.now().timestamp()
+    order = controller.execute(CreateOrderCommand(user=user,transaction_id=transaction_id))
+    #controller.undo()
+    #controller.execute(DeleteOrderCommand(user=user,transaction_id=1703344243.71661))
+    #product = OrderItem.objects.filter(order=order).first()
+    # item = get_object_or_404(product.content_type.model_class(), pk=product.object_id)
+    # command = RemoveFromOrderCommand(order,item)
+    # command.execute()
     return render(request, "home/inbox.html")
 
 

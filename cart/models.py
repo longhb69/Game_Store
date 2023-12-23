@@ -12,7 +12,9 @@ from django.shortcuts import get_object_or_404
 class Command(Protocol):
     def execute(self) -> None:
         ...
-
+    def undo(self) -> None:
+        ...
+    
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     ordered = models.BooleanField(default=False)
@@ -59,17 +61,22 @@ class Order(models.Model):
         total = sum([item.get_total for item in orderitems])
         return total
     
-    def add_item(self, item):
-        cart_item = OrderItem(order=self,
-                             content_type=ContentType.objects.get_for_model(item),
-                             object_id=item.id)
-        cart_item.save()
+    def add_item(self, items):
+        for item in items:
+            product = get_object_or_404(item.content_type.model_class(), pk=item.object_id)
+            cart_item = OrderItem(order=self,
+                                content_type=ContentType.objects.get_for_model(product),
+                                object_id=product.id)
+            cart_item.save()
         
     #item is OrderItem
-    def delete_item(self, item):
-        content_type = ContentType.objects.get_for_model(item)
-        product = OrderItem.objects.get(order=self,content_type=content_type, object_id=item.pk)
-        product.delete()
+    def delete_item(self):
+        orderitems = self.orderitem_set.all()
+        for item in orderitems:
+            item.delete()
+        # content_type = ContentType.objects.get_for_model(item)
+        # product = OrderItem.objects.get(order=self,content_type=content_type, object_id=item.pk)
+        # product.delete()
     
 
 class OrderItem(models.Model):
