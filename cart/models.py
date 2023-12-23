@@ -22,17 +22,6 @@ class Cart(models.Model):
     
     def __str__(self):
         return f"{self.user.username} cart"
-    
-    #item is ProductDecorator,SpecialEditionGame,DLC instance
-    def add_item(self, item):
-        cart_item = CartItem(cart=self,
-                             content_type=ContentType.objects.get_for_model(item),
-                             object_id=item.id)
-        cart_item.save()
-    
-    #item is CartItem instance
-    def delete_item(self, item):
-        item.delete()
         
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
