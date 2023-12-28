@@ -9,14 +9,28 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import mixins 
+from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 
-
+class CategoryPagination(PageNumberPagination):
+   page_size = 4
+   def get_paginated_response(self, data):
+       return Response({
+           'links': {
+               'next': self.get_next_link(),
+               'previous': self.get_previous_link()
+           },
+           'conut': self.page.paginator.count,
+           'total_pages': self.page.paginator.num_pages,
+           'results': data
+       })
+    
 class CategoryMixinView(mixins.ListModelMixin,
                         mixins.RetrieveModelMixin,
                         GenericAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = CategoryPagination
     lookup_field = 'name'
     
     def get_object(self, category):

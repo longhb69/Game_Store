@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from product.models import ProductDecorator,SpecialEditionGame,DLC
+from product.models import ProductDecorator,SpecialEditionGame,DLC,Game
 from django.dispatch import receiver
 from django.db.models.signals import post_save,pre_save,post_delete
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -105,6 +105,8 @@ def pre_save_cart_item(sender, instance, **kwargs):
         if isinstance(product, SpecialEditionGame):
             instance.price = product.price
         if isinstance(product, DLC):
+            instance.price = product.get_cost
+        if isinstance(product, Game):
             instance.price = product.get_cost
     
 

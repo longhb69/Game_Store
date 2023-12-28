@@ -3,9 +3,17 @@ from rest_framework import reverse
 from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator
 
 class CategorySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'slug',
+            'image',
+        ]
+    def get_image(self, instance):
+        return instance.image.url if instance.image else None
 
 class GameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
@@ -20,13 +28,10 @@ class GameSerializer(serializers.ModelSerializer):
             'price',
             'image',
             'cover',
-            'video',
             'category',
         ]
     def get_image(self, instance):
         return instance.image.url if instance.image else None
-    def get_video(self, instance):
-        return instance.video.url if instance.video else None
     def get_cover(self, instance):
         return instance.cover.url if instance.cover else None
     

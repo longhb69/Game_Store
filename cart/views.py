@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from .serializers import *
-from product.models import ProductDecorator,DLC,SpecialEditionGame
+from product.models import ProductDecorator,DLC,SpecialEditionGame,Game
 from product.serializers import ProductDecoratorSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
@@ -18,7 +18,7 @@ from .controller import CartController,OrderController
 
 class CartView(APIView):
     def get(self, request):
-        user = User.objects.get(username="long1")
+        user = User.objects.get(username="long")
         cart = Cart.objects.get(user=user)
         serializer = CartSerializer(cart, many=False).data
         #test = ProductDecorator.objects.get(name="Cyberpunk 2077")
@@ -31,15 +31,15 @@ class CartView(APIView):
         dlc = request.data.get('dlc')
         game_id = request.data.get('game_id')
         cart_id = request.data.get('cart_id')
-        
-        cart = get_object_or_404(Cart,pk=cart_id)            
+        user = get_object_or_404(User,username="long")
+        cart = get_object_or_404(Cart,user=user)
         if dlc: 
             #cart_item_content_type = ContentType.objects.get_for_model(DLC)
             product = get_object_or_404(DLC,pk=game_id)
         elif special:
             product = get_object_or_404(SpecialEditionGame, pk=game_id)
         else:
-            product = get_object_or_404(ProductDecorator, pk=game_id)
+            product = get_object_or_404(Game, pk=game_id)
         try:
             cart_item = CartItem.objects.create(cart=cart,  product=product)
         except Exception as e:

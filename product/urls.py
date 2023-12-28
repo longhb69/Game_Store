@@ -6,7 +6,7 @@ urlpatterns = [
     path('api/category/', views.CategoryMixinView.as_view(), name="category-list"),
     path('api/category/<str:slug>/', views.CategoryMixinView.as_view(), name="category-detail"),
     path('api/game/', views.game_alt_view, name='game-list'),
-    path('api/game/<str:slug>/', views.game_alt_view,name='game-detail'),
+    path('api/game/<str:slug>', views.game_alt_view,name='game-detail'),
     path('api/dlc/<str:slug>/', views.dlc_alt_view,name='dlc-detail'),
     
 ]

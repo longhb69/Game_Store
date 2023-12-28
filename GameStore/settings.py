@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-dxlu-b(=_mido_z*+xcn=+0_s&=%ifdbbvmcf3t4y1(kqcd#30
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.30','192.168.1.5']
 
 
 # Application definition
@@ -66,7 +66,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://192.168.1.45:3000"
 ]
 
 ROOT_URLCONF = 'GameStore.urls'
@@ -141,6 +142,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
+}
 
 cloudinary.config( 
   cloud_name = "dfo61m8dy", 
