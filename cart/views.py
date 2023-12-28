@@ -7,15 +7,16 @@ from .serializers import *
 from product.models import ProductDecorator,DLC,SpecialEditionGame,Game
 from product.serializers import ProductDecoratorSerializer
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 import datetime
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
 from .command import  AddToCartCommand,RemoveFromCartCommand,AddToOrderCommand,RemoveFromOrderCommand,CreateOrderCommand, DeleteOrderCommand
 from .controller import CartController,OrderController
+from rest_framework.permissions import IsAuthenticated
 
 
-
+@permission_classes([IsAuthenticated])
 class CartView(APIView):
     def get(self, request):
         user = User.objects.get(username="long")
