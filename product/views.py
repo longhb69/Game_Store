@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Category,Game,DLC,ProductDecorator,SpecialEditionGame
+from .models import Category,Game,DLC,ProductDecorator,SpecialEditionGame,ConcreteComponent,DLCDecorator
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.urls import reverse
 from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer,SpecialEditionGameDetailSerializer
@@ -49,12 +49,14 @@ class CategoryMixinView(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
 def index(request):
-    game = Game.objects.get(name = "Alan Wake 2")
-    dlc = DLC.objects.get(name="Alan Wake 2 Deluxe Upgrade")
-    test = ProductDecorator.objects.get(game = game)
-    #test.delete_dlc(dlc)
-    test.add_dlc(dlc)
-    print(test.get_cost())
+    game = Game.objects.get(slug='alan-wake-2')
+    dlc = DLC.objects.get(slug='dlc1')
+    dlc2 = DLC.objects.get(slug='dlc2')
+    base_game = ConcreteComponent(game)
+    decorator = DLCDecorator(decorated=base_game, item=dlc)
+    decorator = DLCDecorator(decorated=decorator, item=dlc2)
+
+    print(decorator.get_price())
     return render(request, "home/inbox.html")
 
 @api_view(["POST", "GET"])

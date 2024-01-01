@@ -7,9 +7,6 @@ from unidecode import unidecode
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
-#import six
-
 #don't forget to specity app path. For example:
 #python manage.py makemigrations app
 #python manage.py migrate app
@@ -147,46 +144,25 @@ class ProductDecorator(Item):
 This structure follows the decorator pattern, allowing you to dynamically add responsibilities (toppings and sizes) to objects (beverages) 
 without modifying their code directly. It adheres to the principles of composition and separation of concerns
 """
-
-
-
-
-
-# class Decorator(Item):
-#     beverage = models.ForeignKey(Drink, on_delete=models.CASCADE, default=None)
-#     toppings = models.ManyToManyField(Topping, blank=True)
-#     size = models.ForeignKey(Size, blank=True, default=None, on_delete=models.SET_DEFAULT, null=True)
+class AbstractComponent(ABC):
+    @abstractmethod
+    def get_price(self, item) -> float:
+        pass
     
-#     objects = DecoratorManager()
+class ConcreteComponent(AbstractComponent):
+    def __init__(self, item) -> None:
+        self.item = item
+    def get_price(self) -> float:
+        return self.item.get_cost
     
-#     def add_topping(self, topping):
-#         self.toppings.add(topping)
-#         self.save()
+class AbstractDecorator(AbstractComponent):
+    def __init__(self, decorated: AbstractComponent, item: AbstractComponent) -> None:
+        self.decorated = decorated
+        self.item = item
         
-#     #@property
-#     def get_cost(self):
-#         base_cost = self.beverage.price
-#         topping_cost = sum(topping.get_cost() for topping in self.toppings.all())
-#         size_cost = self.size.price if self.size else 0 
-#         new_cost = base_cost + topping_cost + size_cost
-#         self.set_cost(new_cost)
-#         return new_cost
+class DLCDecorator(AbstractDecorator):
+    def get_price(self) -> float:
+        base_price = self.decorated.get_price()
+        new_price = self.item.get_cost + base_price
+        return new_price
 
-# class Size(models.Model):
-#     class SizeChoice(models.TextChoices):
-#         SMALL = 'Small'
-#         MEDIUM = 'Medium'
-#         LARGE = 'Large'
-#     size = models.CharField(max_length=6,choices=SizeChoice)
-#     price = models.DecimalField(max_digits=8, decimal_places=3, default=0)
-    
-#     def __str__(self):
-#         return self.size + "-" + str(self.price)
-# class Drink(Item):
-#     description = models.CharField(max_length=500,null=True,blank=True)
-#     image = CloudinaryField('iamge', null=True,blank=True)
-#     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True,blank=True)
-#     sizes = models.ManyToManyField(Size)
-    
-# class Topping(Item):
-#     pass    

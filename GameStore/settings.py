@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-dxlu-b(=_mido_z*+xcn=+0_s&=%ifdbbvmcf3t4y1(kqcd#30
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.30','192.168.1.5']
+ALLOWED_HOSTS = ['192.168.1.30','192.168.1.5','127.0.0.1']
 
 
 # Application definition
