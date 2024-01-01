@@ -45,6 +45,7 @@ class DLCSerializer(serializers.ModelSerializer):
             'cover',
             'price',
             'slug',
+            'overview_description',
         ]
     def get_cover(self, instance):
         if hasattr(instance, 'cover'):
