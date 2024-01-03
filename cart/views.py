@@ -42,7 +42,7 @@ class CartView(APIView):
         else:
             product = get_object_or_404(Game, pk=game_id)
         try:
-            cart_item = CartItem.objects.create(cart=cart,  product=product)
+            cart_item = CartItem.objects.create(cart=cart, product=product)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
