@@ -37,12 +37,14 @@ class GameSerializer(serializers.ModelSerializer):
     
 class DLCSerializer(serializers.ModelSerializer):
     cover = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField()
     class Meta:
         model = DLC
         fields = [
             'id',
             'name',
             'cover',
+            'image',
             'price',
             'slug',
             'overview_description',
@@ -54,6 +56,8 @@ class DLCSerializer(serializers.ModelSerializer):
             return instance[0].cover.url if instance[0].cover else None
         else:            
             return None
+    def get_image(self,instance):
+        return instance.image.url if instance.image else None
 
 class SpecialEditionGameSerializer(serializers.ModelSerializer):
     cover = serializers.SerializerMethodField(read_only=True)

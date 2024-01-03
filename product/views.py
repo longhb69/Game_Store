@@ -67,9 +67,11 @@ def game_alt_view(request, slug=None, *args, **kwargs):
             try:
                 obj = get_object_or_404(Game, slug=slug)
                 data = GameDetailSerializer(obj,many=False).data
+                print(data)
             except:
-                obj = get_object_or_404(SpecialEditionGame, slug=slug)
-                data = SpecialEditionGameDetailSerializer(obj,many=False).data
+                return Response("Game connot serializer")
+                #obj = get_object_or_404(SpecialEditionGame, slug=slug)
+                #data = SpecialEditionGameDetailSerializer(obj,many=False).data
             return Response(data)
         queryset = Game.objects.all()
         data = GameSerializer(queryset, many=True).data
