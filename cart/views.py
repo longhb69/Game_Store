@@ -21,7 +21,7 @@ class CustomAuthenticated(IsAuthenticated):
             return super().has_permission(request, view)
         return True
 
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 class CartView(APIView):
     def get(self, request):
         user = request.user
