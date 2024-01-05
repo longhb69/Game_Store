@@ -49,6 +49,13 @@ class Item(models.Model):
     class Meta:
         abstract = True    
 
+class GameImage(models.Model):
+    game = models.ForeignKey('Game', null=True, blank=True,related_name='images', on_delete=models.CASCADE)
+    image = CloudinaryField('image')
+
+    def __str__(self):
+        return f"{self.game.name} image" if self.game else self.image
+
 class Game(Item,Slug):
     video = CloudinaryField(resource_type='video', null=True,blank=True)
     overview_description = models.TextField(null=True, blank=True)
