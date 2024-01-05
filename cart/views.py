@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from .serializers import *
-from product.models import ProductDecorator,DLC,SpecialEditionGame,Game
+from product.models import ProductDecorator,DLC,SpecialEditionGame,Game,ConcreteComponent,DLCDecorator
 from product.serializers import ProductDecoratorSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
@@ -24,7 +24,8 @@ class CustomAuthenticated(IsAuthenticated):
 #@permission_classes([IsAuthenticated])
 class CartView(APIView):
     def get(self, request):
-        user = request.user
+        #user = request.user
+        user = get_object_or_404(User,username="long")
         cart = Cart.objects.get(user=user)
         serializer = CartSerializer(cart, many=False).data
         #test = ProductDecorator.objects.get(name="Cyberpunk 2077")
@@ -33,29 +34,57 @@ class CartView(APIView):
     
     #{"special": false,"dlc":true,"game_id":2,"cart_id":2}
     def post(self, request, *args, **kwargs):
-        special = request.data.get('special')
-        dlc = request.data.get('dlc')
-        game_id = request.data.get('game_id')
-        user = request.user
+        add_on = request.data.get('add_on', [])
+        type = request.data.get('type')
+        base_game_id = request.data.get('base_game_id')
+        #user = request.user
+        user = get_object_or_404(User,username="long")
         cart = get_object_or_404(Cart,user=user)
-        if dlc: 
-            #cart_item_content_type = ContentType.objects.get_for_model(DLC)
-            print(f"DLC {game_id} add to cart")
-            product = get_object_or_404(DLC,pk=game_id)
-        elif special:
-            product = get_object_or_404(SpecialEditionGame, pk=game_id)
-        else:
-            print(f"Game {game_id} add to cart")
-            product = get_object_or_404(Game, pk=game_id)
+        print(base_game_id,add_on)
+        if type == 'game':
+            product = get_object_or_404(Game, id=base_game_id)
+        if type == 'dlc':
+            product = get_object_or_404(DLC, id=base_game_id)
+
+        decorator = ConcreteComponent(product)
+        for item in add_on:
+            dlc = get_object_or_404(DLC, id=item.get('game_id'))
+            decorator = DLCDecorator(decorator, dlc)
+        print(decorator.get_price())
+        print(decorator.get_name())
+        print(decorator.get_dlcs())
+        print(decorator.get_cover())
         try:
-            cart_item = CartItem.objects.create(cart=cart,  product=product)
+            dlcs = decorator.get_dlcs()
+            cart_item = CartItem.objects.create(cart=cart,type=type,
+                                                name=decorator.get_name(), 
+                                                price=decorator.get_price(), 
+                                                cover=decorator.get_cover())
+            cart_item.dlcs.set(dlcs)
+            cart_item.save()
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+        # if dlc: 
+        #     #cart_item_content_type = ContentType.objects.get_for_model(DLC)
+        #     print(f"DLC {game_id} add to cart")
+        #     product = get_object_or_404(DLC,pk=game_id)
+        # elif special:
+        #     product = get_object_or_404(SpecialEditionGame, pk=game_id)
+        # else:
+        #     print(f"Game {game_id} add to cart")
+        #     product = get_object_or_404(Game, pk=game_id)
+        # try:
+        #     cart_item = CartItem.objects.create(cart=cart,  product=product)
+        # except Exception as e:
+        #     return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
         return JsonResponse({'message': 'CartItem created successfully'}, status=201)
     
     def delete(self, request, *args, **kwargs):
         item_pk = kwargs.get('item_pk')
+        print("Item PK: ",item_pk)
         cart_item = CartItem.objects.get(pk=item_pk)
         cart_item.delete()
         return Response('item delete')
@@ -76,6 +105,16 @@ def delete_dlc_in_cart(requset, *args, **kwargs):
     product.delete_dlc(dlc)
     cart_item.save()
     return Response(' ')
+
+class CartQuantityView(APIView):
+    def get(self, request):
+        user = get_object_or_404(User, username="long")
+        cart = get_object_or_404(Cart, user=user)
+        try:
+            cart_items = CartItem.objects.filter(cart=cart).count()
+            return Response({'quantity': cart_items}, status=status.HTTP_200_OK)
+        except CartItem.DoesNotExist:
+            return Response({'quantity': 0}, status=status.HTTP_200_OK)
 
 
 

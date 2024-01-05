@@ -16,9 +16,11 @@ class SpecialEditionGameAdmin(admin.ModelAdmin):
 
 class DLCAdmin(admin.ModelAdmin):
     list_display = ['name','id']
+class GameAdmin(admin.ModelAdmin):
+    list_display = ['name','id']
 
 admin.site.register(Category)
-admin.site.register(Game)
+admin.site.register(Game,GameAdmin)
 admin.site.register(DLC,DLCAdmin)
 admin.site.register(ProductDecorator,ProductDecoratorAdmin)
 admin.site.register(SpecialEditionGame,SpecialEditionGameAdmin)
