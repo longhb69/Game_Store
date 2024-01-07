@@ -37,10 +37,9 @@ class CartView(APIView):
         add_on = request.data.get('add_on', [])
         type = request.data.get('type')
         base_game_id = request.data.get('base_game_id')
-        #user = request.user
-        user = get_object_or_404(User,username="long")
+        user = request.user
+        #user = get_object_or_404(User,username="long")
         cart = get_object_or_404(Cart,user=user)
-        print(base_game_id,add_on)
         if type == 'game':
             product = get_object_or_404(Game, id=base_game_id)
         if type == 'dlc':
@@ -50,10 +49,6 @@ class CartView(APIView):
         for item in add_on:
             dlc = get_object_or_404(DLC, id=item.get('game_id'))
             decorator = DLCDecorator(decorator, dlc)
-        print(decorator.get_price())
-        print(decorator.get_name())
-        print(decorator.get_dlcs())
-        print(decorator.get_cover())
         try:
             dlcs = decorator.get_dlcs()
             cart_item = CartItem.objects.create(cart=cart,type=type,
@@ -84,7 +79,6 @@ class CartView(APIView):
     
     def delete(self, request, *args, **kwargs):
         item_pk = kwargs.get('item_pk')
-        print("Item PK: ",item_pk)
         cart_item = CartItem.objects.get(pk=item_pk)
         cart_item.delete()
         return Response('item delete')
@@ -108,15 +102,26 @@ def delete_dlc_in_cart(requset, *args, **kwargs):
 
 class CartQuantityView(APIView):
     def get(self, request):
-        user = get_object_or_404(User, username="long")
+        user = request.user
+        #user = get_object_or_404(User, username="long")
         cart = get_object_or_404(Cart, user=user)
         try:
             cart_items = CartItem.objects.filter(cart=cart).count()
             return Response({'quantity': cart_items}, status=status.HTTP_200_OK)
         except CartItem.DoesNotExist:
             return Response({'quantity': 0}, status=status.HTTP_200_OK)
-
-
+        
+class ItemInCart(APIView):
+    def get(self, request):
+        user = request.user
+        #user = get_object_or_404(User, username="long")
+        cart = get_object_or_404(Cart, user=user)
+        cart_items = CartItem.objects.filter(cart=cart)
+        items_name = [item.slug for item in cart_items]
+        dlc = []
+        for cart_item in cart_items:
+            dlc += [dlc.slug for dlc in cart_item.dlcs.all()]
+        return Response({'items_name': items_name + dlc})
 
 def checkout(request):
     user = User.objects.get(username="long1")

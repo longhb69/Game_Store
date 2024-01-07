@@ -142,26 +142,26 @@ def save_user_cart(sender, instance, *args,**kwargs):
 #             instance.price = product.get_cost
     
 
-# @receiver(post_save, sender=CartItem)
-# def add_price_cart_item(sender, instance, created, *args,**kwargs):
-#     cart = Cart.objects.get(id=instance.cart.id)
-#     cart_items = CartItem.objects.filter(cart=cart)
-#     if created:
-#         total_price = sum(cart_item.price for cart_item in cart_items)
-#         cart.total_price = total_price 
-#         cart.save()
-#     else:
-#         total_price = sum(cart_item.price for cart_item in cart_items)
-#         cart.total_price = total_price 
-#         cart.save()
+@receiver(post_save, sender=CartItem)
+def add_price_cart_item(sender, instance, created, *args,**kwargs):
+    cart = Cart.objects.get(id=instance.cart.id)
+    cart_items = CartItem.objects.filter(cart=cart)
+    if created:
+        total_price = sum(cart_item.price for cart_item in cart_items)
+        cart.total_price = total_price 
+        cart.save()
+    else:
+        total_price = sum(cart_item.price for cart_item in cart_items)
+        cart.total_price = total_price 
+        cart.save()
         
-# @receiver(post_delete, sender=CartItem)
-# def update_cart_total_price(sender, instance, **kwargs):
-#     cart = Cart.objects.get(id=instance.cart.id)
-#     cart_items = CartItem.objects.filter(cart=cart)
-#     total_price = sum(cart_item.price for cart_item in cart_items)
-#     cart.total_price = total_price 
-#     cart.save()
+@receiver(post_delete, sender=CartItem)
+def update_cart_total_price(sender, instance, **kwargs):
+    cart = Cart.objects.get(id=instance.cart.id)
+    cart_items = CartItem.objects.filter(cart=cart)
+    total_price = sum(cart_item.price for cart_item in cart_items)
+    cart.total_price = total_price 
+    cart.save()
 
 
 

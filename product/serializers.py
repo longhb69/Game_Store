@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import reverse
-from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator,GameImage
+from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator,GameImage, GameVideo
 
 class CategorySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
@@ -98,9 +98,21 @@ class GameImageSerializer(serializers.ModelSerializer):
         ]
     def get_image(self, instance):
         return instance.image.url
+    
+class GameVideoSerializer(serializers.ModelSerializer):
+    video = serializers.SerializerMethodField()
+    class Meta:
+        model = GameVideo
+        fields = [
+            'id',
+            'video'
+        ]
+    def get_video(self, instance):
+        return instance.video.url
 
 class GameDetailSerializer(serializers.ModelSerializer):
     video =  serializers.SerializerMethodField(read_only=True)
+    videos = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField(read_only=True)
     cover = serializers.SerializerMethodField(read_only=True)
     category = CategorySerializer(many=True,read_only=True)
@@ -119,6 +131,9 @@ class GameDetailSerializer(serializers.ModelSerializer):
     def get_game_image(self, instance):
         game_images = instance.images.all()
         return GameImageSerializer(game_images, many=True).data
+    def get_videos(self, instance):
+        game_videos = instance.videos.all()
+        return GameVideoSerializer(game_videos, many=True).data
     
     def to_representation(self, instance):
         if isinstance(instance,DLC):
