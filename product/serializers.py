@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import reverse
-from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator
+from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator,GameImage, GameVideo
 
 class CategorySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
@@ -17,6 +17,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
+    background = serializers.SerializerMethodField(read_only=True)
+    hero = serializers.SerializerMethodField(read_only=True)
     cover = serializers.SerializerMethodField(read_only=True)
     category = CategorySerializer(many=True,read_only=True)
     class Meta:
@@ -27,13 +29,20 @@ class GameSerializer(serializers.ModelSerializer):
             'slug',
             'price',
             'image',
+            'background',
+            'hero',
             'cover',
+            'year',
             'category',
         ]
     def get_image(self, instance):
         return instance.image.url if instance.image else None
     def get_cover(self, instance):
         return instance.cover.url if instance.cover else None
+    def get_background(self, instance):
+        return instance.background.url if instance.background else None
+    def get_hero(self, instance):
+        return instance.hero.url if instance.hero else None
     
 class DLCSerializer(serializers.ModelSerializer):
     cover = serializers.SerializerMethodField(read_only=True)
@@ -88,13 +97,37 @@ class SpecialEditionGameSerializer(serializers.ModelSerializer):
     def get_base_game_id(self, instance):
         return instance.base_game.id
     
+class GameImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = GameImage
+        fields = [
+            'id',
+            'image'
+        ]
+    def get_image(self, instance):
+        return instance.image.url
+    
+class GameVideoSerializer(serializers.ModelSerializer):
+    video = serializers.SerializerMethodField()
+    class Meta:
+        model = GameVideo
+        fields = [
+            'id',
+            'video'
+        ]
+    def get_video(self, instance):
+        return instance.video.url
+
 class GameDetailSerializer(serializers.ModelSerializer):
     video =  serializers.SerializerMethodField(read_only=True)
+    videos = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField(read_only=True)
     cover = serializers.SerializerMethodField(read_only=True)
     category = CategorySerializer(many=True,read_only=True)
     dlc = DLCSerializer(many=True, read_only=True, source='dlcs')
     special_edition = SpecialEditionGameSerializer(many=True, read_only=True, source='base')
+    game_image = serializers.SerializerMethodField()
     class Meta:
         model = Game
         fields = '__all__'
@@ -104,6 +137,12 @@ class GameDetailSerializer(serializers.ModelSerializer):
         return instance.video.url if instance.video else None
     def get_cover(self, instance):
         return instance.cover.url if instance.cover else None
+    def get_game_image(self, instance):
+        game_images = instance.images.all()
+        return GameImageSerializer(game_images, many=True).data
+    def get_videos(self, instance):
+        game_videos = instance.videos.all()
+        return GameVideoSerializer(game_videos, many=True).data
     
     def to_representation(self, instance):
         if isinstance(instance,DLC):

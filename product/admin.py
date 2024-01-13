@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
-from .models import Category,Game,DLC,ProductDecorator,SpecialEditionGame
+from .models import Category,Game,DLC,ProductDecorator,SpecialEditionGame,GameImage,GameVideo
 
 class ProductDecoratorAdmin(admin.ModelAdmin):
     list_display = ['name','display_content_type','id']
@@ -16,9 +16,13 @@ class SpecialEditionGameAdmin(admin.ModelAdmin):
 
 class DLCAdmin(admin.ModelAdmin):
     list_display = ['name','id']
+class GameAdmin(admin.ModelAdmin):
+    list_display = ['name','id']
 
 admin.site.register(Category)
-admin.site.register(Game)
+admin.site.register(Game,GameAdmin)
 admin.site.register(DLC,DLCAdmin)
 admin.site.register(ProductDecorator,ProductDecoratorAdmin)
 admin.site.register(SpecialEditionGame,SpecialEditionGameAdmin)
+admin.site.register(GameImage)
+admin.site.register(GameVideo)

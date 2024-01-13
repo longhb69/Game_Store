@@ -24,7 +24,18 @@ class CategoryPagination(PageNumberPagination):
            'total_pages': self.page.paginator.num_pages,
            'results': data
        })
+
+class NewFeaturedView(APIView):
+    def get(self, request):
+        games = ['alan-wake-2', 'the-last-of-ustm-part-i','the-callisto-protocol','grand-theft-auto-v', 'red-dead-redemption-2']
+        try: 
+            newfeatured = Game.objects.filter(slug__in=games)
+            serializer = GameSerializer(newfeatured, many=True).data
+            return Response(serializer)
+        except Game.DoesNotExist:
+            return JsonResponse("Games doesn't exists!")
     
+
 class CategoryMixinView(mixins.ListModelMixin,
                         mixins.RetrieveModelMixin,
                         GenericAPIView):
@@ -67,7 +78,6 @@ def game_alt_view(request, slug=None, *args, **kwargs):
             try:
                 obj = get_object_or_404(Game, slug=slug)
                 data = GameDetailSerializer(obj,many=False).data
-                print(data)
             except:
                 return Response("Game connot serializer")
                 #obj = get_object_or_404(SpecialEditionGame, slug=slug)
