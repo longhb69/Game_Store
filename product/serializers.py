@@ -19,6 +19,7 @@ class GameSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     background = serializers.SerializerMethodField(read_only=True)
     hero = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField(read_only=True)
     category = CategorySerializer(many=True,read_only=True)
     class Meta:
@@ -43,6 +44,9 @@ class GameSerializer(serializers.ModelSerializer):
         return instance.background.url if instance.background else None
     def get_hero(self, instance):
         return instance.hero.url if instance.hero else None
+    def get_price(self,instance):
+        formatted_number = f'{instance.price:,.3f}'.replace(".",",")
+        return formatted_number
     
 class DLCSerializer(serializers.ModelSerializer):
     cover = serializers.SerializerMethodField(read_only=True)
@@ -124,6 +128,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
     videos = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField(read_only=True)
     cover = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField()
     category = CategorySerializer(many=True,read_only=True)
     dlc = DLCSerializer(many=True, read_only=True, source='dlcs')
     special_edition = SpecialEditionGameSerializer(many=True, read_only=True, source='base')
@@ -143,6 +148,9 @@ class GameDetailSerializer(serializers.ModelSerializer):
     def get_videos(self, instance):
         game_videos = instance.videos.all()
         return GameVideoSerializer(game_videos, many=True).data
+    def get_price(self,instance):
+        formatted_number = f'{instance.price:,.3f}'.replace(".",",")
+        return formatted_number
     
     def to_representation(self, instance):
         if isinstance(instance,DLC):

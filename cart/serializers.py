@@ -6,6 +6,7 @@ from product.serializers import ProductDecoratorSerializer,SpecialEditionGameSer
 class CartItemSerializer(serializers.ModelSerializer):
     #product = serializers.SerializerMethodField(allow_null=True)
     cover = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
     dlcs = DLCSerializer(many=True)
     class Meta:
         model = CartItem
@@ -20,6 +21,10 @@ class CartItemSerializer(serializers.ModelSerializer):
         ]
     def get_cover(self,instance):
         return instance.cover.url if instance.cover else None
+    def get_price(self,instance):
+        formatted_number = f'{instance.price:,.3f}'.replace(".",",")
+        return formatted_number
+    
     # def get_product(self,instance):
     #     if isinstance(instance.product,ProductDecorator):
     #         return ProductDecoratorSerializer(instance.product).data
