@@ -1,15 +1,16 @@
 from dataclasses import dataclass
-from .models import Cart,CartItem,Order,OrderItem
+from .models import Cart,CartItem,Order,OrderItem,ItemType
 from django.contrib.auth.models import User
 from typing import Union
-from product.models import SpecialEditionGame,DLC,ProductDecorator
+from django.contrib.contenttypes.models import ContentType
+from product.models import SpecialEditionGame,DLC,ProductDecorator,Game
 from django.shortcuts import get_object_or_404
 
 
 @dataclass 
 class AddToOrderCommand:
     order: Order
-    items: Union[SpecialEditionGame,DLC,ProductDecorator]
+    items: Union[SpecialEditionGame,DLC,Game]
     
     def execute(self) -> None:
         if self.items is None: 
@@ -37,6 +38,22 @@ class CreateOrderCommand:
     transaction_id: float
     def execute(self) -> Order:
         order, created = Order.objects.get_or_create(user=self.user, transaction_id=self.transaction_id)
+        cart = Cart.objects.get(user=self.user)
+        items = CartItem.objects.filter(cart=cart)
+        for item in items:
+            if item.type == ItemType.GAME.value:
+                game = Game.objects.get(slug=item.slug)
+                order_item = OrderItem.objects.create(order=order, 
+                                                    content_type=ContentType.objects.get_for_model(game),
+                                                    object_id=game.id)
+            elif item.type == ItemType.DLC.value:
+                game = DLC.objects.get(slug=item.slug)
+                order_item = OrderItem.objects.create(order=order, 
+                                                    content_type=ContentType.objects.get_for_model(game),
+                                                    object_id=game.id)
+            else:
+                return "Error can't create Order"
+        items.delete()
         return order
     def undo(self):
         order = get_object_or_404(Order, user=self.user, transaction_id=self.transaction_id)

@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-dxlu-b(=_mido_z*+xcn=+0_s&=%ifdbbvmcf3t4y1(kqcd#30
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.30','192.168.1.5','127.0.0.1','192.168.1.6','192.168.1.3','192.168.1.14']
+ALLOWED_HOSTS = ['192.168.1.30','192.168.1.5','127.0.0.1','192.168.1.6','192.168.1.3','192.168.1.14', '192.168.1.37','192.168.1.6']
 
 
 # Application definition
@@ -67,7 +67,9 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication',],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10
 }
@@ -80,6 +82,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://192.168.1.45:3000",
     "http://192.168.1.14:3000",
+    "http://192.168.1.6:3000",
 ]
 
 ROOT_URLCONF = 'GameStore.urls'

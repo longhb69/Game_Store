@@ -49,10 +49,26 @@ class Item(models.Model):
     class Meta:
         abstract = True    
 
+class GameImage(models.Model):
+    game = models.ForeignKey('Game', null=True, blank=True,related_name='images', on_delete=models.CASCADE)
+    image = CloudinaryField('images')
+
+    def __str__(self):
+        return f"{self.game.name} image" if self.game else self.image
+    
+class GameVideo(models.Model):
+    game = game = models.ForeignKey('Game', null=True, blank=True,related_name='videos', on_delete=models.CASCADE)
+    video = CloudinaryField(resource_type='video')
+
+    def __str__(self):
+        return f"{self.game.name} video" if self.game else self.video 
+
 class Game(Item,Slug):
     video = CloudinaryField(resource_type='video', null=True,blank=True)
     overview_description = models.TextField(null=True, blank=True)
     detail_description = models.TextField(null=True, blank=True)
+    hero = CloudinaryField(null=True,blank=True)
+    background = CloudinaryField(null=True,blank=True)
     image = CloudinaryField('image', null=True,blank=True)
     cover = CloudinaryField('cover', null=True,blank=True)
     category = models.ManyToManyField(Category,null=True,blank=True)
@@ -144,25 +160,51 @@ class ProductDecorator(Item):
 This structure follows the decorator pattern, allowing you to dynamically add responsibilities (toppings and sizes) to objects (beverages) 
 without modifying their code directly. It adheres to the principles of composition and separation of concerns
 """
+from typing import List
+
 class AbstractComponent(ABC):
     @abstractmethod
     def get_price(self, item) -> float:
+        pass
+    def get_name(self) -> str:
+        pass
+    def get_dlcs(self):
+        pass
+    def get_cover(self):
         pass
     
 class ConcreteComponent(AbstractComponent):
     def __init__(self, item) -> None:
         self.item = item
+        self.dlcs: List[DLC] = []
     def get_price(self) -> float:
         return self.item.get_cost
+    def get_name(self):
+        return self.item.name
+    def get_cover(self):
+        return self.item.cover
+    def get_dlcs(self):
+        return self.dlcs
+    def add_dlc(self,dlc):
+        self.dlcs.append(dlc)
     
 class AbstractDecorator(AbstractComponent):
     def __init__(self, decorated: AbstractComponent, item: AbstractComponent) -> None:
         self.decorated = decorated
         self.item = item
+        self.decorated.add_dlc(item)
         
 class DLCDecorator(AbstractDecorator):
     def get_price(self) -> float:
         base_price = self.decorated.get_price()
         new_price = self.item.get_cost + base_price
         return new_price
+    def get_name(self) -> str:
+        return self.decorated.get_name()
+    def get_cover(self):
+        return self.decorated.get_cover()
+    def get_dlcs(self):
+        return self.decorated.get_dlcs()
+    def add_dlc(self,dlc):
+        self.decorated.add_dlc(dlc)
 
