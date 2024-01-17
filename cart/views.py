@@ -112,8 +112,8 @@ class CartQuantityView(APIView):
         
 class ItemInCart(APIView):
     def get(self, request):
-        user = request.user
-        #user = get_object_or_404(User, username="long")
+        #user = request.user
+        user = get_object_or_404(User, username="long")
         cart = get_object_or_404(Cart, user=user)
         cart_items = CartItem.objects.filter(cart=cart)
         items_name = [item.slug for item in cart_items]
@@ -186,12 +186,9 @@ def test2(request):
 def test3(request):
     controller = OrderController()
     user = User.objects.get(username="long") 
-    cart = Cart.objects.get(user=user)
-    items = CartItem.objects.filter(cart=cart)
-    for item in items:
-        if item.type == ItemType.GAME.value:
-            for dlc in item.dlcs.all():
-                print(dlc)
+    order = Order.objects.create(user=user)
+    game = Game.objects.get(id=1)
+    order.add_item(game)
     
     return render(request, "home/inbox.html")
 

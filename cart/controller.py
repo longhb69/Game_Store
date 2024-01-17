@@ -8,9 +8,8 @@ class CartController:
         
 @dataclass
 class OrderController:
-    
     def execute(self, command:Command):
-        command.execute()
-        return command.execute()
+        result = command.execute()
+        return result
    
         

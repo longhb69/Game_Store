@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from .models import Cart,CartItem,Order,OrderItem,ItemType
+from .models import Cart,CartItem,Order,ItemType
+from account.models import Libary
 from django.contrib.auth.models import User
 from typing import Union
-from django.contrib.contenttypes.models import ContentType
 from product.models import SpecialEditionGame,DLC,ProductDecorator,Game
 from django.shortcuts import get_object_or_404
 
@@ -11,7 +11,6 @@ from django.shortcuts import get_object_or_404
 class AddToOrderCommand:
     order: Order
     items: Union[SpecialEditionGame,DLC,Game]
-    
     def execute(self) -> None:
         if self.items is None: 
             return
@@ -25,7 +24,6 @@ class AddToOrderCommand:
 @dataclass
 class RemoveFromOrderCommand:
     order: Order
-    
     def execute(self) -> None:
         self.order.delete_item()
     
@@ -40,25 +38,22 @@ class CreateOrderCommand:
         order = Order.objects.create(user=self.user, transaction_id=self.transaction_id)
         cart = Cart.objects.get(user=self.user)
         items = CartItem.objects.filter(cart=cart)
+        libary = Libary.objects.get(user=self.user)
         for item in items:
             if item.type == ItemType.GAME.value:
                 game = Game.objects.get(slug=item.slug)
-                OrderItem.objects.create(order=order, 
-                                                    content_type=ContentType.objects.get_for_model(game),
-                                                    object_id=game.id)
+                order.add_item(game)
+                libary.add_libary_item(order=order, product=game)
                 for dlc in item.dlcs.all():
                     dlc = DLC.objects.get(slug=dlc.slug)
-                    OrderItem.objects.create(order=order,
-                                            content_type=ContentType.objects.get_for_model(dlc),
-                                            object_id=dlc.id)
-                
+                    order.add_item(dlc)
+                    libary.add_libary_item(order=order, product=dlc)
             elif item.type == ItemType.DLC.value:
                 game = DLC.objects.get(slug=item.slug)
-                OrderItem.objects.create(order=order, 
-                                                    content_type=ContentType.objects.get_for_model(game),
-                                                    object_id=game.id)
+                order.add_item(game)
+                libary.add_libary_item(order=order, product=game)
             else:
-                return "Error can't create Order"
+                pass
         items.delete()
         return order
     def undo(self):
@@ -75,11 +70,6 @@ class DeleteOrderCommand:
     def undo(self) -> Order:
         order, created = Order.objects.get_or_create(user=self.user, transaction_id=self.transaction_id)
         return order
-
-
-
-
-
 
 @dataclass
 class AddToCartCommand:

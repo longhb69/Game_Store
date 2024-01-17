@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-from product.models import ProductDecorator,SpecialEditionGame,DLC
+from product.models import ProductDecorator,SpecialEditionGame,DLC,Game
 from product.serializers import ProductDecoratorSerializer,SpecialEditionGameSerializer,DLCSerializer,GameSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -51,8 +51,31 @@ class CartSerializer(serializers.ModelSerializer):
         formatted_number = f'{instance.total_price:,.3f}'.replace(".",",")
         return formatted_number
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    item = serializers.SerializerMethodField(allow_null=True)
+    class Meta:
+        model = OrderItem
+        fields = [
+            'id',
+            'item'
+        ]
+    def get_item(self, instance):
+        if isinstance(instance.product, Game):
+            return GameSerializer(instance.product).data
+        elif isinstance(instance.product, DLC):
+            return DLCSerializer(instance.product).data
+
 class OrderSerializer(serializers.ModelSerializer):
+    items = serializers.SerializerMethodField()
     class Meta:
         model = Order
-        fields = '__all__'
-
+        fields = [
+            'id',
+            'date_orderd',
+            'complete',
+            'transaction_id',
+            'items',
+        ]
+    def get_items(self, instance):
+        order_items = OrderItem.objects.filter(order=instance)
+        return OrderItemSerializer(order_items, many=True).data

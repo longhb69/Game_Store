@@ -87,13 +87,11 @@ class Order(models.Model):
         total = sum([item.get_total for item in orderitems])
         return total
     
-    def add_item(self, items):
-        for item in items:
-            product = get_object_or_404(item.content_type.model_class(), pk=item.object_id)
-            cart_item = OrderItem(order=self,
-                                content_type=ContentType.objects.get_for_model(product),
-                                object_id=product.id)
-            cart_item.save()
+    def add_item(self, item):
+        cart_item = OrderItem(order=self,
+                            content_type=ContentType.objects.get_for_model(item),
+                            object_id=item.id)
+        cart_item.save()
         
     #item is OrderItem
     def delete_item(self):
@@ -128,6 +126,7 @@ def create_user_cart(sender, instance, created, *args,**kwargs):
 @receiver(post_save, sender=User)
 def save_user_cart(sender, instance, *args,**kwargs):
     instance.cart.save()
+    
 
 # @receiver(pre_save, sender=CartItem)
 # def pre_save_cart_item(sender, instance, **kwargs):
