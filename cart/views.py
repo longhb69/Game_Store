@@ -130,7 +130,8 @@ class CheckoutFromCart(APIView):
         transaction_id = datetime.datetime.now().timestamp()
         try:
             order = controller.execute(CreateOrderCommand(user=user,transaction_id=transaction_id))
-            return Response(status=status.HTTP_200_OK)
+            serializers = OrderSerializer(order, many=False).data
+            return Response(serializers,status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -180,14 +181,17 @@ def test2(request):
         else:
             #return 404
             pass
-        #order_item = OrderItem.objects.create()
     return render(request, "home/inbox.html")
 
 def test3(request):
     controller = OrderController()
     user = User.objects.get(username="long") 
-    transaction_id = datetime.datetime.now().timestamp()
-    order = controller.execute(CreateOrderCommand(user=user,transaction_id=transaction_id))
+    cart = Cart.objects.get(user=user)
+    items = CartItem.objects.filter(cart=cart)
+    for item in items:
+        if item.type == ItemType.GAME.value:
+            for dlc in item.dlcs.all():
+                print(dlc)
     
     return render(request, "home/inbox.html")
 

@@ -37,18 +37,24 @@ class CreateOrderCommand:
     user: User
     transaction_id: float
     def execute(self) -> Order:
-        order, created = Order.objects.get_or_create(user=self.user, transaction_id=self.transaction_id)
+        order = Order.objects.create(user=self.user, transaction_id=self.transaction_id)
         cart = Cart.objects.get(user=self.user)
         items = CartItem.objects.filter(cart=cart)
         for item in items:
             if item.type == ItemType.GAME.value:
                 game = Game.objects.get(slug=item.slug)
-                order_item = OrderItem.objects.create(order=order, 
+                OrderItem.objects.create(order=order, 
                                                     content_type=ContentType.objects.get_for_model(game),
                                                     object_id=game.id)
+                for dlc in item.dlcs.all():
+                    dlc = DLC.objects.get(slug=dlc.slug)
+                    OrderItem.objects.create(order=order,
+                                            content_type=ContentType.objects.get_for_model(dlc),
+                                            object_id=dlc.id)
+                
             elif item.type == ItemType.DLC.value:
                 game = DLC.objects.get(slug=item.slug)
-                order_item = OrderItem.objects.create(order=order, 
+                OrderItem.objects.create(order=order, 
                                                     content_type=ContentType.objects.get_for_model(game),
                                                     object_id=game.id)
             else:

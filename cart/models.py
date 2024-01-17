@@ -109,7 +109,7 @@ class OrderItem(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
     object_id = models.PositiveIntegerField()
     product = GenericForeignKey('content_type', 'object_id')
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL,blank=True,null=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE,blank=True,null=True)
     
     def __str__(self):
         return self.product.name
@@ -117,12 +117,6 @@ class OrderItem(models.Model):
     def get_total(self):
         return self.product.get_cost
     
-
-
-class CheckoutStep(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    step_number = models.PositiveIntegerField()
-    #payment details
 
     
     

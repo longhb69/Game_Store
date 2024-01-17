@@ -51,4 +51,8 @@ class CartSerializer(serializers.ModelSerializer):
         formatted_number = f'{instance.total_price:,.3f}'.replace(".",",")
         return formatted_number
 
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'
 

@@ -11,5 +11,6 @@ class OrderController:
     
     def execute(self, command:Command):
         command.execute()
+        return command.execute()
    
         
