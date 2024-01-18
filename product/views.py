@@ -24,6 +24,8 @@ class CategoryPagination(PageNumberPagination):
            'total_pages': self.page.paginator.num_pages,
            'results': data
        })
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 5
 
 class NewFeaturedView(APIView):
     def get(self, request):
@@ -99,6 +101,19 @@ def dlc_alt_view(request, slug=None, *args, **kwargs):
         data = GameSerializer(queryset, many=True).data
         return Response(data) 
 
+class TopSellers(mixins.ListModelMixin,mixins.RetrieveModelMixin,GenericAPIView):
+    pagination_class = StandardResultsSetPagination
+    queryset = Game.objects.filter(sell_number__gte = 20).order_by('-id')
+    serializer_class = GameSerializer
+    def get(self, request,*args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+class MostPopular(mixins.ListModelMixin,GenericAPIView):
+    queryset = Game.objects.all()[:13]
+    serializer_class = GameSerializer
+    def get(self, request,*args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
 # def add(request):
 #     if request.method == 'POST':
 #         condiments_selection = request.POST.getlist('condiments')

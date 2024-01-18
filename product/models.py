@@ -73,6 +73,7 @@ class Game(Item,Slug):
     cover = CloudinaryField('cover', null=True,blank=True)
     category = models.ManyToManyField(Category,null=True,blank=True)
     year = models.DateField(null=True,blank=True)
+    sell_number = models.BigIntegerField(null=True, blank=True, default=0)
     
     os_min = models.CharField(max_length=50, verbose_name='Minimum OS', null=True, blank=True)
     os_rec = models.CharField(max_length=50, verbose_name='Recommended OS', null=True, blank=True)
