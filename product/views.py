@@ -22,6 +22,7 @@ class CategoryPagination(PageNumberPagination):
            },
            'conut': self.page.paginator.count,
            'total_pages': self.page.paginator.num_pages,
+           'current_page': self.page.number,
            'results': data
        })
 class StandardResultsSetPagination(PageNumberPagination):
@@ -109,7 +110,7 @@ class TopSellers(mixins.ListModelMixin,mixins.RetrieveModelMixin,GenericAPIView)
         return self.list(request, *args, **kwargs)
 
 class MostPopular(mixins.ListModelMixin,GenericAPIView):
-    queryset = Game.objects.all()[:13]
+    queryset = Game.objects.all()
     serializer_class = GameSerializer
     def get(self, request,*args, **kwargs):
         return self.list(request, *args, **kwargs)
