@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view, permission_classes
 import datetime
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
-from .command import  AddToCartCommand,RemoveFromCartCommand,AddToOrderCommand,RemoveFromOrderCommand,CreateOrderCommand, DeleteOrderCommand
+from .command import  AddToCartCommand,RemoveFromCartCommand,AddToOrderCommand,RemoveFromOrderCommand,CreateOrderFromCartCommand, DeleteOrderCommand,CreateOrder
 from .controller import CartController,OrderController
 from rest_framework.permissions import IsAuthenticated
 
@@ -129,11 +129,26 @@ class CheckoutFromCart(APIView):
         user = User.objects.get(username="long") 
         transaction_id = datetime.datetime.now().timestamp()
         try:
-            order = controller.execute(CreateOrderCommand(user=user,transaction_id=transaction_id))
+            order = controller.execute(CreateOrderFromCartCommand(user=user,transaction_id=transaction_id))
             serializers = OrderSerializer(order, many=False).data
             return Response(serializers,status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        
+@permission_classes([IsAuthenticated])
+class Checkout(APIView):
+    def post(self,request,*args, **kwargs):
+        game_id = request.data.get('game_id')
+        controller = OrderController()
+        user = request.user
+        transaction_id = datetime.datetime.now().timestamp()
+        try:
+            order = controller.execute(CreateOrder(user=user, transaction_id=transaction_id,game_id=game_id))
+            serializers = OrderSerializer(order, many=False).data
+            return Response(serializers,status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
 
 def checkout(request):
     user = User.objects.get(username="long1")
@@ -152,7 +167,7 @@ def test(request):
     user = User.objects.get(username="long1")
     cart = Cart.objects.get(user=user)
     transaction_id = datetime.datetime.now().timestamp()
-    order = controller.execute(CreateOrderCommand(user=user,transaction_id=transaction_id))
+    #order = controller.execute(CreateOrderCommand(user=user,transaction_id=transaction_id))
     #controller.undo()
     #controller.execute(DeleteOrderCommand(user=user,transaction_id=1703344243.71661))``
     #product = OrderItem.objects.filter(order=order).first()

@@ -16,13 +16,3 @@ urlpatterns = [
     path('search2', views.SearchListView2.as_view(), name='search'),
     
 ]
-
-
-
-
-
-
-   #path('test/', views.index),
-    # path('api/drink/', views.drink_alt_view, name="drink-list"),
-    # path('api/drink/<str:slug>/', views.drink_alt_view, name="drink-detail"),
-    # path('api/topping/',views.topping_alt_view, name="topping-list"),

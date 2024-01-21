@@ -31,7 +31,7 @@ class RemoveFromOrderCommand:
         self.order.add_item(item=self.item)
 
 @dataclass
-class CreateOrderCommand:
+class CreateOrderFromCartCommand:
     user: User
     transaction_id: float
     def execute(self) -> Order:
@@ -59,6 +59,19 @@ class CreateOrderCommand:
     def undo(self):
         order = get_object_or_404(Order, user=self.user, transaction_id=self.transaction_id)
         order.delete()
+
+@dataclass
+class CreateOrder:
+    user: User
+    transaction_id: float
+    game_id: int
+    def execute(self) -> Order:
+        order = Order.objects.create(user=self.user, transaction_id=self.transaction_id)
+        item = Game.objects.get(id=self.game_id)
+        libary = Libary.objects.get(user=self.user)
+        order.add_item(item)
+        libary.add_libary_item(order=order, product=item)
+        return order
 
 @dataclass
 class DeleteOrderCommand:

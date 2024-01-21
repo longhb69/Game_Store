@@ -153,6 +153,8 @@ class SearchListView2(generics.ListAPIView):
 class SearchListView1(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         query = request.GET.get('q')
+        if not query:
+            return Response("")
         tag = request.GET.get('tag') 
         results = perform_search(query)
         ids = [r["id"] for r in results['hits']]
