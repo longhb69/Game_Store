@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Category,Game,DLC,ProductDecorator,SpecialEditionGame,ConcreteComponent,DLCDecorator
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.urls import reverse
 from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer,SpecialEditionGameDetailSerializer
@@ -11,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework import mixins 
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
+from algoliasearch_django import algolia_engine
 
 class CategoryPagination(PageNumberPagination):
    page_size = 4
@@ -104,7 +106,7 @@ def dlc_alt_view(request, slug=None, *args, **kwargs):
 
 class TopSellers(mixins.ListModelMixin,mixins.RetrieveModelMixin,GenericAPIView):
     pagination_class = StandardResultsSetPagination
-    queryset = Game.objects.filter(sell_number__gte = 20).order_by('-id')
+    queryset = Game.objects.filter(sell_number__gte = 50).order_by('-id')
     serializer_class = GameSerializer
     def get(self, request,*args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -114,7 +116,51 @@ class MostPopular(mixins.ListModelMixin,GenericAPIView):
     serializer_class = GameSerializer
     def get(self, request,*args, **kwargs):
         return self.list(request, *args, **kwargs)
-    
+
+class NewRelease(mixins.ListModelMixin, GenericAPIView):
+    queryset = Game.objects.filter(year__year__gte = 2023)
+    serializer_class = GameSerializer
+    def get(self, request,*args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+def get_client():
+    return algolia_engine.client
+def get_index(index_name='long_Game'):
+    client = get_client()
+    index = client.init_index(index_name)
+    return index
+def perform_search(query, **kwargs):
+    index = get_index()
+    params = {}
+    tags = ""
+    if "tags" in kwargs:
+        tags = kwargs.pop("tags") or []
+        if len(tags) != 0:
+            params['tagFilters'] = tags
+            print(params['tagFilters'])
+    results = index.search(query,params)
+    return results
+
+class SearchListView2(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q')
+        tag = request.GET.get('tag') or None
+        if not query:
+            return Response("")
+        results = perform_search(query, tags=tag)
+        return Response(results)
+
+class SearchListView1(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q')
+        tag = request.GET.get('tag') 
+        results = perform_search(query)
+        ids = [r["id"] for r in results['hits']]
+        q = Game.objects.filter(id__in = ids)
+        serializer = GameSerializer(q, many=True).data
+        return Response(serializer)
+        
+        
 # def add(request):
 #     if request.method == 'POST':
 #         condiments_selection = request.POST.getlist('condiments')

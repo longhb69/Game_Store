@@ -45,11 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    #3rd party
     "rest_framework",
     "rest_framework_simplejwt",
+    "algoliasearch_django",
+
     "product",
-    
-"cart",
+    "cart",
     "account",
     "cloudinary",
     "corsheaders",
@@ -72,7 +74,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
 }
 
 SIMPLE_JWT = {
@@ -166,3 +167,9 @@ cloudinary.config(
 )
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+ALGOLIA = {
+    'APPLICATION_ID': 'CBCBPTMVM7',
+    'API_KEY': '04a1a1b4639f61d65975d70e215f429d',
+    'INDEX_PREFIX': 'long'
+}

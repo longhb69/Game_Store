@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Q
+from django.db.models.query import QuerySet
 from cloudinary.models import CloudinaryField
 from django.db import models
 from abc import ABCMeta,ABC, abstractmethod
@@ -62,7 +64,7 @@ class GameVideo(models.Model):
 
     def __str__(self):
         return f"{self.game.name} video" if self.game else self.video 
-
+    
 class Game(Item,Slug):
     video = CloudinaryField(resource_type='video', null=True,blank=True)
     overview_description = models.TextField(null=True, blank=True)
@@ -71,7 +73,7 @@ class Game(Item,Slug):
     background = CloudinaryField(null=True,blank=True)
     image = CloudinaryField('image', null=True,blank=True)
     cover = CloudinaryField('cover', null=True,blank=True)
-    category = models.ManyToManyField(Category,null=True,blank=True)
+    category = models.ManyToManyField(Category,blank=True)
     year = models.DateField(null=True,blank=True)
     sell_number = models.BigIntegerField(null=True, blank=True, default=0)
     
@@ -87,6 +89,10 @@ class Game(Item,Slug):
     directx_rec = models.CharField(max_length=10, verbose_name='Recommended DirectX', null=True, blank=True)
     graphics_min = models.CharField(max_length=100, verbose_name='Minimum Graphics', null=True, blank=True)
     graphics_rec = models.CharField(max_length=100, verbose_name='Recommended Graphics', null=True, blank=True)
+
+    def get_categories(self):
+        return [[category.name,category.id] for category in self.category.all()]
+
     
 class DLC(Item,Slug):
     game = models.ForeignKey(Game, on_delete=models.CASCADE,null=True,blank=True, related_name='dlcs')
@@ -113,7 +119,6 @@ class DLC(Item,Slug):
 class SpecialEditionGame(Item,Slug):
     base_game = models.ForeignKey(Game,on_delete=models.CASCADE,null=True,blank=True, related_name='base')
     dlcs = models.ManyToManyField(DLC,blank=True)
-    
 
 
 class DecoratorManager(models.Manager):

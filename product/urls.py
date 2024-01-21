@@ -9,8 +9,11 @@ urlpatterns = [
     path('api/game/<str:slug>', views.game_alt_view,name='game-detail'),
     path('api/topsellers', views.TopSellers.as_view(), name="topsellers"),
     path('api/mostpopular', views.MostPopular.as_view(), name="most-popular"),
+    path('api/newrelease', views.NewRelease.as_view(), name="new-release"),
     path('api/dlc/<str:slug>/', views.dlc_alt_view,name='dlc-detail'),
     path('api/newfeatured/', views.NewFeaturedView.as_view(), name='newfeatured'),
+    path('search', views.SearchListView1.as_view(), name='search'),
+    path('search2', views.SearchListView2.as_view(), name='search'),
     
 ]
 
