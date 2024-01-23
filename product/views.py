@@ -1,8 +1,7 @@
 from django.shortcuts import render
-from .models import Category,Game,DLC,ProductDecorator,SpecialEditionGame,ConcreteComponent,DLCDecorator
+from .models import Category,Game,DLC,SpecialEditionGame,ConcreteComponent,DLCDecorator
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
-from django.urls import reverse
+from django.http import JsonResponse
 from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer,SpecialEditionGameDetailSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -155,10 +154,15 @@ class SearchListView1(generics.ListAPIView):
         query = request.GET.get('q')
         if not query:
             return Response("")
-        tag = request.GET.get('tag') 
+        tag = request.GET.get('tag')
         results = perform_search(query)
         ids = [r["id"] for r in results['hits']]
         q = Game.objects.filter(id__in = ids)
+        if tag:
+            new_tag = tag.split(",")
+            category_filter  = Category.objects.filter(name__in=new_tag)
+            for category in category_filter :
+                q = q.filter(category=category)
         serializer = GameSerializer(q, many=True).data
         return Response(serializer)
         
