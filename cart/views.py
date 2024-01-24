@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view, permission_classes
 import datetime
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
-from .command import  AddToCartCommand,RemoveFromCartCommand,AddToOrderCommand,RemoveFromOrderCommand,CreateOrderFromCartCommand, DeleteOrderCommand,CreateOrder
+from .command import RemoveFromOrderCommand,CreateOrderFromCartCommand, DeleteOrderCommand,CreateOrder
 from .controller import CartController,OrderController
 from rest_framework.permissions import IsAuthenticated
 
@@ -24,12 +24,9 @@ class CustomAuthenticated(IsAuthenticated):
 #@permission_classes([IsAuthenticated])
 class CartView(APIView):
     def get(self, request):
-        #user = request.user
-        user = get_object_or_404(User,username="long")
+        user = request.user
         cart = Cart.objects.get(user=user)
         serializer = CartSerializer(cart, many=False).data
-        #test = ProductDecorator.objects.get(name="Cyberpunk 2077")
-        #serializer = ProductDecoratorSerializer(test, many=False).data
         return Response(serializer)
     
     def post(self, request, *args, **kwargs):
@@ -37,7 +34,6 @@ class CartView(APIView):
         type = request.data.get('type')
         base_game_id = request.data.get('base_game_id')
         user = request.user
-        #user = get_object_or_404(User,username="long")
         cart = get_object_or_404(Cart,user=user)
         if type == 'game':
             product = get_object_or_404(Game, id=base_game_id)
@@ -58,21 +54,6 @@ class CartView(APIView):
             cart_item.save()
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        
-        # if dlc: 
-        #     #cart_item_content_type = ContentType.objects.get_for_model(DLC)
-        #     print(f"DLC {game_id} add to cart")
-        #     product = get_object_or_404(DLC,pk=game_id)
-        # elif special:
-        #     product = get_object_or_404(SpecialEditionGame, pk=game_id)
-        # else:
-        #     print(f"Game {game_id} add to cart")
-        #     product = get_object_or_404(Game, pk=game_id)
-        # try:
-        #     cart_item = CartItem.objects.create(cart=cart,  product=product)
-        # except Exception as e:
-        #     return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 
         return JsonResponse({'message': 'CartItem created successfully'}, status=201)
     
@@ -102,7 +83,6 @@ def delete_dlc_in_cart(requset, *args, **kwargs):
 class CartQuantityView(APIView):
     def get(self, request):
         user = request.user
-        #user = get_object_or_404(User, username="long")
         cart = get_object_or_404(Cart, user=user)
         try:
             cart_items = CartItem.objects.filter(cart=cart).count()

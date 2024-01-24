@@ -62,6 +62,16 @@ class CategoryMixinView(mixins.ListModelMixin,
             serializer = GameSerializer(instance, many=True).data
             return Response(serializer)
         return self.list(request, *args, **kwargs)
+    
+class CategoryMixinView2(mixins.ListModelMixin,
+                        mixins.RetrieveModelMixin,
+                        GenericAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    lookup_field = 'name'
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+        
 
 def index(request):
     game = Game.objects.get(slug='alan-wake-2')
@@ -104,7 +114,6 @@ def dlc_alt_view(request, slug=None, *args, **kwargs):
         return Response(data) 
 
 class TopSellers(mixins.ListModelMixin,mixins.RetrieveModelMixin,GenericAPIView):
-    pagination_class = StandardResultsSetPagination
     queryset = Game.objects.filter(sell_number__gte = 50).order_by('-id')
     serializer_class = GameSerializer
     def get(self, request,*args, **kwargs):
