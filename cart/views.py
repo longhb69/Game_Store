@@ -21,7 +21,7 @@ class CustomAuthenticated(IsAuthenticated):
             return super().has_permission(request, view)
         return True
 
-#@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 class CartView(APIView):
     def get(self, request):
         user = request.user
@@ -92,8 +92,8 @@ class CartQuantityView(APIView):
         
 class ItemInCart(APIView):
     def get(self, request):
-        #user = request.user
-        user = get_object_or_404(User, username="long")
+        user = request.user
+        #user = get_object_or_404(User, username="long")
         cart = get_object_or_404(Cart, user=user)
         cart_items = CartItem.objects.filter(cart=cart)
         items_name = [item.slug for item in cart_items]
@@ -106,7 +106,8 @@ class ItemInCart(APIView):
 class CheckoutFromCart(APIView):
     def post(self,request):
         controller = OrderController()
-        user = User.objects.get(username="long") 
+        #user = User.objects.get(username="long") 
+        user = request.user
         transaction_id = datetime.datetime.now().timestamp()
         try:
             order = controller.execute(CreateOrderFromCartCommand(user=user,transaction_id=transaction_id))

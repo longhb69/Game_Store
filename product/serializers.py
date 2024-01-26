@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import reverse
-from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator,GameImage, GameVideo
+from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator,GameImage, GameVideo, Developer, Publisher
 
 class CategorySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
@@ -34,6 +34,7 @@ class GameSerializer(serializers.ModelSerializer):
             'hero',
             'cover',
             'year',
+            'overview_description',
             'category',
         ]
     def get_image(self, instance):
@@ -48,6 +49,16 @@ class GameSerializer(serializers.ModelSerializer):
         formatted_number = f'{instance.price:,.3f}'.replace(".",",")
         return formatted_number
     
+    
+class DeveloperSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Developer
+        fields = '__all__'
+class PublisherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Publisher
+        fields = '__all__'
+
 class DLCSerializer(serializers.ModelSerializer):
     cover = serializers.SerializerMethodField(read_only=True)
     image = serializers.SerializerMethodField()
@@ -133,6 +144,8 @@ class GameDetailSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     cover = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField()
+    developer = DeveloperSerializer()
+    publisher = PublisherSerializer()
     category = CategorySerializer(many=True,read_only=True)
     dlc = DLCSerializer(many=True, read_only=True, source='dlcs')
     special_edition = SpecialEditionGameSerializer(many=True, read_only=True, source='base')

@@ -8,11 +8,17 @@ from product.serializers import GameSerializer, DLCSerializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [
-            'pk',
-            'username',
-        ]
-
+        fields = '__all__'
+        
+    def create(self,validated_data):
+        user = User.objects.create(
+            username = validated_data['username'],
+            email = validated_data['email']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+    
 class LibaryItemSerializer(serializers.ModelSerializer):
     product = serializers.SerializerMethodField(allow_null=True)
     class Meta:

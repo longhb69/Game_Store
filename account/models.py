@@ -33,5 +33,6 @@ class LibaryItem(models.Model):
 
 @receiver(post_save, sender=User)
 def create_user_libary(sender, instance, created, *args,**kwargs):
-    Libary.objects.create(user=instance)
+    if created and not Libary.objects.filter(user=instance).exists():
+        Libary.objects.create(user=instance)
 

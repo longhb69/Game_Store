@@ -59,11 +59,11 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -79,7 +79,10 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
-
+CORS_ORIGIN_WHITELIST = (
+    "http://192.168.1.4:3000",
+)
+CSRF_TRUSTED_ORIGINS = ['http://192.168.1.4:3000']
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://192.168.1.45:3000",

@@ -51,6 +51,16 @@ class Item(models.Model):
     class Meta:
         abstract = True    
 
+class Developer(models.Model):
+    name = models.CharField(max_length=50, null=True, blank=True)
+    def __str__(self) -> str:
+        return self.name
+    
+class Publisher(models.Model):
+    name = models.CharField(max_length=50, null=True, blank=True)
+    def __str__(self) -> str:
+        return self.name
+
 class GameImage(models.Model):
     game = models.ForeignKey('Game', null=True, blank=True,related_name='images', on_delete=models.CASCADE)
     image = CloudinaryField('images')
@@ -76,6 +86,8 @@ class Game(Item,Slug):
     category = models.ManyToManyField(Category,blank=True)
     year = models.DateField(null=True,blank=True)
     sell_number = models.BigIntegerField(null=True, blank=True, default=0)
+    developer = models.ForeignKey(Developer, on_delete=models.CASCADE, null=True, blank=True)
+    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, null=True, blank=True)
     
     os_min = models.CharField(max_length=50, verbose_name='Minimum OS', null=True, blank=True)
     os_rec = models.CharField(max_length=50, verbose_name='Recommended OS', null=True, blank=True)

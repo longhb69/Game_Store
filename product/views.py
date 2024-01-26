@@ -149,16 +149,7 @@ def perform_search(query, **kwargs):
     results = index.search(query,params)
     return results
 
-class SearchListView2(generics.ListAPIView):
-    def get(self, request, *args, **kwargs):
-        query = request.GET.get('q')
-        tag = request.GET.get('tag') or None
-        if not query:
-            return Response("")
-        results = perform_search(query, tags=tag)
-        return Response(results)
-
-class SearchListView1(generics.ListAPIView):
+class SearchListView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         query = request.GET.get('q')
         if not query:

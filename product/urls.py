@@ -13,7 +13,6 @@ urlpatterns = [
     path('api/new-release', views.NewRelease.as_view(), name="new-release"),
     path('api/dlc/<str:slug>/', views.dlc_alt_view,name='dlc-detail'),
     path('api/newfeatured/', views.NewFeaturedView.as_view(), name='newfeatured'),
-    path('search', views.SearchListView1.as_view(), name='search'),
-    path('search2', views.SearchListView2.as_view(), name='search'),
+    path('search', views.SearchListView.as_view(), name='search'),
     
 ]
