@@ -126,7 +126,13 @@ class MostPopular(mixins.ListModelMixin,GenericAPIView):
         return self.list(request, *args, **kwargs)
 
 class NewRelease(mixins.ListModelMixin, GenericAPIView):
-    queryset = Game.objects.filter(year__year__gte = 2023)
+    queryset = Game.objects.filter(year__year = 2023)
+    serializer_class = GameSerializer
+    def get(self, request,*args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+class CommingSoon(mixins.ListModelMixin, GenericAPIView):
+    queryset = Game.objects.filter(year__year__gte = 2024)
     serializer_class = GameSerializer
     def get(self, request,*args, **kwargs):
         return self.list(request, *args, **kwargs)
