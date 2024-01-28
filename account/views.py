@@ -6,11 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
 from rest_framework.decorators import api_view
-
-
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -25,7 +21,6 @@ class UserView(APIView):
 class GameInLibary(APIView):
     def get(self, request):
         user = request.user
-        #user = get_object_or_404(User, username="long")
         libary = get_object_or_404(Libary, user=user)
         libary_items = LibaryItem.objects.filter(libary=libary)
         games_name = [item.product.slug for item in libary_items]
@@ -33,7 +28,6 @@ class GameInLibary(APIView):
 
 class LibaryView(APIView):
     def get(self, request):
-        #user = User.objects.get(username="long")
         user = request.user
         libary = Libary.objects.get(user=user)
         libary_items = LibaryItem.objects.filter(libary=libary)

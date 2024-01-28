@@ -21,6 +21,8 @@ class GameSerializer(serializers.ModelSerializer):
     hero = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField(read_only=True)
+    cover12x12 = serializers.SerializerMethodField(read_only=True)
+    logo = serializers.SerializerMethodField(read_only=True)
     category = CategorySerializer(many=True,read_only=True)
     class Meta:
         model = Game
@@ -33,6 +35,8 @@ class GameSerializer(serializers.ModelSerializer):
             'background',
             'hero',
             'cover',
+            'cover12x12',
+            'logo',
             'year',
             'overview_description',
             'category',
@@ -41,6 +45,10 @@ class GameSerializer(serializers.ModelSerializer):
         return instance.image.url if instance.image else None
     def get_cover(self, instance):
         return instance.cover.url if instance.cover else None
+    def get_cover12x12(self, instance):
+        return instance.cover12x12.url if instance.cover12x12 else None
+    def get_logo(self, instance):
+        return instance.logo.url if instance.logo else None
     def get_background(self, instance):
         return instance.background.url if instance.background else None
     def get_hero(self, instance):

@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from .models import Category,Game,DLC,SpecialEditionGame,ConcreteComponent,DLCDecorator
-from django.db.models import Q
 from django.http import JsonResponse
 from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer,SpecialEditionGameDetailSerializer
 from rest_framework import generics

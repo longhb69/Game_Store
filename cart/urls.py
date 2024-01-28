@@ -15,4 +15,3 @@ urlpatterns = [
 ]
 
 
-#http://127.0.0.1:8000/cart/cartitem/delete_dlc/True/2/5/32/3/
