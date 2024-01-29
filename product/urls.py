@@ -14,6 +14,7 @@ urlpatterns = [
     path('api/comming-soon', views.CommingSoon.as_view(), name="comming-soon"),
     path('api/dlc/<str:slug>/', views.dlc_alt_view,name='dlc-detail'),
     path('api/newfeatured/', views.NewFeaturedView.as_view(), name='newfeatured'),
+    path('api/developer/<str:slug>', views)
     path('search', views.SearchListView.as_view(), name='search'),
     
 ]
