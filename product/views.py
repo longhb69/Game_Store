@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from .models import Category,Game,DLC,SpecialEditionGame,ConcreteComponent,DLCDecorator
+from .models import Category,Game,DLC,SpecialEditionGame,ConcreteComponent,DLCDecorator, Publisher
 from django.http import JsonResponse
 from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer,SpecialEditionGameDetailSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -135,6 +136,22 @@ class CommingSoon(mixins.ListModelMixin, GenericAPIView):
     serializer_class = GameSerializer
     def get(self, request,*args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+class DeveloperView(APIView):
+    def get(self, request, *args, **kwargs):
+        slug=self.kwargs.get('slug', None)
+        if slug is not None:
+            publisher = Publisher.objects.get(slug=slug)
+            games = Game.objects.filter(publisher=publisher)
+            serializer = GameSerializer(games, many=True).data
+            publisher_logo = {"name": publisher.name}
+            response_data = {
+                'games': serializer,
+                'publisher': publisher_logo
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Slug not found"}, status=status.HTTP_400_BAD_REQUEST)
 
 def get_client():
     return algolia_engine.client

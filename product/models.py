@@ -51,12 +51,12 @@ class Item(models.Model):
     class Meta:
         abstract = True    
 
-class Developer(models.Model):
+class Developer(Slug):
     name = models.CharField(max_length=50, null=True, blank=True)
     def __str__(self) -> str:
         return self.name
     
-class Publisher(models.Model):
+class Publisher(Slug):
     name = models.CharField(max_length=50, null=True, blank=True)
     def __str__(self) -> str:
         return self.name
