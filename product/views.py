@@ -183,7 +183,7 @@ class SearchListView(generics.ListAPIView):
         if tag:
             new_tag = tag.split(",")
             category_filter  = Category.objects.filter(name__in=new_tag)
-            for category in category_filter :
+            for category in category_filter:
                 q = q.filter(category=category)
         serializer = GameSerializer(q, many=True).data
         return Response(serializer)

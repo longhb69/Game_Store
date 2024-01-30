@@ -1,5 +1,7 @@
 from .serializers import UserSerializer, LibaryItemSerializer
+from django.db.models import Q
 from .models import Libary, LibaryItem
+from product.models import Category,Game
 from cart.models import Order
 from cart.serializers import OrderSerializer
 from rest_framework import status
@@ -10,6 +12,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+
 
 @permission_classes([IsAuthenticated])
 class UserView(APIView):
@@ -26,13 +29,46 @@ class GameInLibary(APIView):
         games_name = [item.product.slug for item in libary_items]
         return Response({'items_name': games_name})
 
+@permission_classes([IsAuthenticated])
 class LibaryView(APIView):
     def get(self, request):
         user = request.user
+        #user = User.objects.get(username="tu")
         libary = Libary.objects.get(user=user)
         libary_items = LibaryItem.objects.filter(libary=libary)
+        categories_dict = {}
+        for item in libary_items:
+            categories = item.product.category.all()
+            for category in categories:
+                if category.name in categories_dict:
+                    categories_dict[category.name] += 1
+                else:
+                    categories_dict[category.name] = 1
+        query = request.GET.get('q')
+        if query:
+            libary_items = libary_items.filter(Q(product__name__icontains=query))
+            print(libary_items)
+        tag = request.GET.get('tag')
+        if tag:
+            new_tag = tag.split(",")
+            ids_to_remove = []
+            category_filter  = Category.objects.filter(name__in=new_tag)
+            for item in libary_items:
+                count = 0
+                categories = item.product.category.all()
+                for category in categories:
+                    if category in category_filter:
+                        count += 1
+                if(count != category_filter.count()):
+                    ids_to_remove.append(item.id)
+            libary_items = libary_items.exclude(id__in=ids_to_remove)
+                        
         serializer = LibaryItemSerializer(libary_items, many=True).data
-        return Response(serializer)
+        response_data = {
+            'games' : serializer,
+            'categories' : list(categories_dict.items())
+        }
+        return Response(response_data)
 
 class TransactionsView(APIView):
     def get(self, request):
