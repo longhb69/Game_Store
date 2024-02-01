@@ -66,7 +66,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
             return DLCSerializer(instance.product).data
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = serializers.SerializerMethodField()
+    order = serializers.SerializerMethodField()
+    date_orderd = serializers.SerializerMethodField()
     class Meta:
         model = Order
         fields = [
@@ -74,8 +75,11 @@ class OrderSerializer(serializers.ModelSerializer):
             'date_orderd',
             'complete',
             'transaction_id',
-            'items',
+            'order',
         ]
-    def get_items(self, instance):
+    def get_order(self, instance):
         order_items = OrderItem.objects.filter(order=instance)
-        return OrderItemSerializer(order_items, many=True).data
+        return OrderItemSerializer(order_items,many=True).data
+    def get_date_orderd(self, instance):
+        formatted_date = instance.date_orderd.strftime("%m/%d/%Y")
+        return formatted_date

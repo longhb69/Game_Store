@@ -1,7 +1,6 @@
 from .serializers import UserSerializer, LibaryItemSerializer
-from django.db.models import Q
 from .models import Libary, LibaryItem
-from product.models import Category,Game
+from product.models import Category
 from cart.models import Order
 from cart.serializers import OrderSerializer
 from rest_framework import status
@@ -12,6 +11,11 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+from rest_framework.pagination import PageNumberPagination
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 2
 
 
 @permission_classes([IsAuthenticated])
@@ -33,7 +37,6 @@ class GameInLibary(APIView):
 class LibaryView(APIView):
     def get(self, request):
         user = request.user
-        #user = User.objects.get(username="tu")
         libary = Libary.objects.get(user=user)
         libary_items = LibaryItem.objects.filter(libary=libary)
         categories_dict = {}
@@ -46,8 +49,12 @@ class LibaryView(APIView):
                     categories_dict[category.name] = 1
         query = request.GET.get('q')
         if query:
-            libary_items = libary_items.filter(Q(product__name__icontains=query))
-            print(libary_items)
+            id_to_keep = []
+            for item in libary_items:
+                if query and query.lower() in item.product.name.lower():
+                    id_to_keep.append(item.id)
+            libary_items = libary_items.filter(id__in=id_to_keep)
+
         tag = request.GET.get('tag')
         if tag:
             new_tag = tag.split(",")
@@ -71,11 +78,16 @@ class LibaryView(APIView):
         return Response(response_data)
 
 class TransactionsView(APIView):
+    pagination_class = StandardResultsSetPagination
     def get(self, request):
-        user = User.objects.get(username="long")
+        paginator = self.pagination_class()
+        user = request.user
+        #user = User.objects.get(username='tu')
         order = Order.objects.filter(user=user)
         serializer = OrderSerializer(order, many=True).data
-        return Response(serializer)
+        result_page = paginator.paginate_queryset(order, request)
+        serializer = OrderSerializer(result_page, many=True).data
+        return paginator.get_paginated_response(serializer)
 
 @api_view(['POST'])
 def register(request):

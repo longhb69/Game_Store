@@ -130,33 +130,6 @@ class Checkout(APIView):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-
-def checkout(request):
-    user = User.objects.get(username="long1")
-    # transaction_id = datetime.datetime.now().timestamp()
-    cart = Cart.objects.get(user=user)
-    items = CartItem.objects.filter(cart=cart)
-    order, created = Order.objects.get_or_create(user=user)
-    controller = OrderController()
-    controller.execute(AddToOrderCommand(order,items))
-    #controller.execute(RemoveFromOrderCommand(order))
-    print(order.get_order_total)
-    return render(request, "home/inbox.html")
-
-def test(request):
-    controller = OrderController()
-    user = User.objects.get(username="long1")
-    cart = Cart.objects.get(user=user)
-    transaction_id = datetime.datetime.now().timestamp()
-    #order = controller.execute(CreateOrderCommand(user=user,transaction_id=transaction_id))
-    #controller.undo()
-    #controller.execute(DeleteOrderCommand(user=user,transaction_id=1703344243.71661))``
-    #product = OrderItem.objects.filter(order=order).first()
-    # item = get_object_or_404(product.content_type.model_class(), pk=product.object_id)
-    # command = RemoveFromOrderCommand(order,item)
-    # command.execute()
-    return render(request, "home/inbox.html")
-
 def test2(request):
     user = User.objects.get(username="long") 
     cart = Cart.objects.get(user=user)
@@ -179,13 +152,5 @@ def test2(request):
             pass
     return render(request, "home/inbox.html")
 
-def test3(request):
-    controller = OrderController()
-    user = User.objects.get(username="long") 
-    order = Order.objects.create(user=user)
-    game = Game.objects.get(id=1)
-    order.add_item(game)
-    
-    return render(request, "home/inbox.html")
 
 

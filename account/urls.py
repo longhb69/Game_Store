@@ -6,5 +6,5 @@ urlpatterns = [
     path('register',views.register, name='register'),
     path('libary', views.LibaryView.as_view(), name="libary"),
     path('game_in_libary', views.GameInLibary.as_view(), name="game_in_libary"),
-    path('transactions', views.TransactionsView.as_view(), name="transactions")
+    path('transactions', views.TransactionsView.as_view(), name="transactions"),
 ]
