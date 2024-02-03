@@ -69,11 +69,18 @@ class GameImage(models.Model):
         return f"{self.game.name} image" if self.game else self.image
     
 class GameVideo(models.Model):
-    game = game = models.ForeignKey('Game', null=True, blank=True,related_name='videos', on_delete=models.CASCADE)
+    game = models.ForeignKey('Game', null=True, blank=True,related_name='videos', on_delete=models.CASCADE)
     video = CloudinaryField(resource_type='video')
 
     def __str__(self):
         return f"{self.game.name} video" if self.game else self.video 
+
+class DLCImage(models.Model):
+    dlc = models.ForeignKey('DLC', null=True, blank=True,related_name='images', on_delete=models.CASCADE)
+    image = CloudinaryField('images')
+
+    def __str__(self):
+        return f"{self.dlc.name} image" if self.dlc else self.image
     
 class Game(Item,Slug):
     video = CloudinaryField(resource_type='video', null=True,blank=True)
@@ -110,13 +117,17 @@ class Game(Item,Slug):
 
     
 class DLC(Item,Slug):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE,null=True,blank=True, related_name='dlcs')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='dlcs')
+    video = CloudinaryField(resource_type='video', null=True,blank=True)
     overview_description = models.TextField(null=True, blank=True)
     detail_description = models.TextField(null=True, blank=True)
     image = CloudinaryField('image', null=True,blank=True)
     cover = CloudinaryField('cover', null=True,blank=True)
     category = models.ManyToManyField(Category,null=True,blank=True)
     year = models.DateField(null=True,blank=True)
+    developer = models.ForeignKey(Developer, on_delete=models.CASCADE, null=True, blank=True)
+    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, null=True, blank=True)
+    specialColor = models.CharField(max_length=20, null=True, blank=True)
     
     os_min = models.CharField(max_length=50, verbose_name='Minimum OS', null=True, blank=True)
     os_rec = models.CharField(max_length=50, verbose_name='Recommended OS', null=True, blank=True)
@@ -130,6 +141,24 @@ class DLC(Item,Slug):
     directx_rec = models.CharField(max_length=10, verbose_name='Recommended DirectX', null=True, blank=True)
     graphics_min = models.CharField(max_length=100, verbose_name='Minimum Graphics', null=True, blank=True)
     graphics_rec = models.CharField(max_length=100, verbose_name='Recommended Graphics', null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.specialColor = self.specialColor or self.game.specialColor
+        self.developer = self.developer or self.game.developer
+        self.publisher = self.publisher or self.game.publisher
+        self.os_min = self.os_min or self.game.os_min
+        self.os_rec = self.os_rec or self.game.os_rec
+        self.processor_min = self.processor_min or self.game.processor_min
+        self.processor_rec = self.processor_rec or self.game.processor_rec
+        self.memory_min = self.memory_min or self.game.memory_min
+        self.memory_rec = self.memory_rec or self.game.memory_rec
+        self.storage_min = self.storage_min or self.game.storage_min
+        self.storage_rec = self.storage_rec or self.game.storage_rec
+        self.directx_min = self.directx_min or self.game.directx_min
+        self.directx_rec = self.directx_rec or self.game.directx_rec
+        self.graphics_min = self.graphics_min or self.game.graphics_min
+        self.graphics_rec = self.graphics_rec or self.game.graphics_rec
+        return super().save(*args, **kwargs)
 
 class SpecialEditionGame(Item,Slug):
     base_game = models.ForeignKey(Game,on_delete=models.CASCADE,null=True,blank=True, related_name='base')

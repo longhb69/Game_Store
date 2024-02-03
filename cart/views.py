@@ -32,13 +32,13 @@ class CartView(APIView):
     def post(self, request, *args, **kwargs):
         add_on = request.data.get('add_on', [])
         type = request.data.get('type')
-        base_game_id = request.data.get('base_game_id')
+        game_id = request.data.get('game_id')
         user = request.user
         cart = get_object_or_404(Cart,user=user)
         if type == 'game':
-            product = get_object_or_404(Game, id=base_game_id)
+            product = get_object_or_404(Game, id=game_id)
         if type == 'dlc':
-            product = get_object_or_404(DLC, id=base_game_id)
+            product = get_object_or_404(DLC, id=game_id)
 
         decorator = ConcreteComponent(product)
         for item in add_on:
@@ -120,11 +120,17 @@ class CheckoutFromCart(APIView):
 class Checkout(APIView):
     def post(self,request,*args, **kwargs):
         game_id = request.data.get('game_id')
+        type = request.data.get('type')
         controller = OrderController()
         user = request.user
         transaction_id = datetime.datetime.now().timestamp()
+        item_type = None
+        if type == "game":
+            item_type = ItemType.GAME
+        elif type == "dlc":
+            item_type = ItemType.DLC
         try:
-            order = controller.execute(CreateOrder(user=user, transaction_id=transaction_id,game_id=game_id))
+            order = controller.execute(CreateOrder(user=user, transaction_id=transaction_id,game_id=game_id,item_type=item_type))
             serializers = OrderSerializer(order, many=False).data
             return Response(serializers,status=status.HTTP_200_OK)
         except Exception as e:

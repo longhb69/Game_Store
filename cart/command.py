@@ -65,9 +65,13 @@ class CreateOrder:
     user: User
     transaction_id: float
     game_id: int
+    item_type: ItemType
     def execute(self) -> Order:
         order = Order.objects.create(user=self.user, transaction_id=self.transaction_id)
-        item = Game.objects.get(id=self.game_id)
+        if self.item_type == ItemType.GAME:
+            item = Game.objects.get(id=self.game_id)
+        elif self.item_type == ItemType.DLC:
+            item = DLC.objects.get(id=self.game_id)
         libary = Libary.objects.get(user=self.user)
         order.add_item(item)
         libary.add_libary_item(order=order, product=item)

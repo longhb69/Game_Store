@@ -152,6 +152,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     cover = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField()
+    year = serializers.SerializerMethodField()
     developer = DeveloperSerializer()
     publisher = PublisherSerializer()
     category = CategorySerializer(many=True,read_only=True)
@@ -176,6 +177,9 @@ class GameDetailSerializer(serializers.ModelSerializer):
     def get_price(self,instance):
         formatted_number = f'{instance.price:,.3f}'.replace(".",",")
         return formatted_number
+    def get_year(self, instance):
+        formatted_date = instance.year.strftime("%m/%d/%Y")
+        return formatted_date
     
     def to_representation(self, instance):
         if isinstance(instance,DLC):
@@ -204,23 +208,35 @@ class GameMetaDetailsSerializer(serializers.ModelSerializer):
     
 class DLCDetailSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
-    detail = serializers.SerializerMethodField(read_only=True)
+    video =  serializers.SerializerMethodField(read_only=True)
+    developer = DeveloperSerializer()
+    publisher = PublisherSerializer()
+    game_images = serializers.SerializerMethodField()
+    category = CategorySerializer(many=True,read_only=True)
+    cover = serializers.SerializerMethodField(read_only=True)
+    year = serializers.SerializerMethodField()
     class Meta:
         model = DLC
-        fields = [
-            'name',
-            'price',
-            'slug',
-            'overview_description',
-            'detail_description',
-            'image',
-            'detail',
-        ]
+        fields = '__all__'
     def get_image(self, instance):
         return instance.image.url if instance.image else None
     def get_detail(self, instance):
         game_serializers = GameMetaDetailsSerializer(instance.game)
         return game_serializers.data
+    def get_cover(self, instance):
+        return instance.cover.url if instance.cover else None
+    def get_video(self, instance):
+        return instance.video.url if instance.video else None
+    def get_game_images(self, instance):
+        game_images = instance.images.all()
+        return GameImageSerializer(game_images, many=True).data
+    def get_price(self,instance):
+        formatted_number = f'{instance.price:,.3f}'.replace(".",",")
+        return formatted_number
+    def get_year(self, instance):
+        formatted_date = instance.year.strftime("%m/%d/%Y")
+        return formatted_date
+    
 
 class SpecialEditionGameDetailSerializer(serializers.ModelSerializer):
     dlcs = DLCSerializer(many=True, read_only=True)

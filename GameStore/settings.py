@@ -89,6 +89,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://192.168.1.14:3000",
     "http://192.168.1.6:3000",
     "http://192.168.1.4:3000",
+    "http://192.168.1.10:3000",
 ]
 
 ROOT_URLCONF = 'GameStore.urls'
