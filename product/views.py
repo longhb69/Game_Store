@@ -137,6 +137,13 @@ class CommingSoon(mixins.ListModelMixin, GenericAPIView):
     def get(self, request,*args, **kwargs):
         return self.list(request, *args, **kwargs)
 
+class PicksForYou(mixins.ListModelMixin, GenericAPIView):
+    games = ['outer-wilds','marvels-spider-man-miles-morales','the-quarry','sifu','the-last-of-ustm-part-i','grand-theft-auto-v', 'red-dead-redemption-2']
+    queryset = Game.objects.filter(slug__in = games)
+    serializer_class = GameSerializer
+    def get(self, request,*args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
 class DeveloperView(APIView):
     def get(self, request, *args, **kwargs):
         slug=self.kwargs.get('slug', None)
