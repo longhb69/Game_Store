@@ -63,7 +63,7 @@ class Cart(models.Model):
         
 class CartItem(Item,Slug):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
-    type = models.CharField(max_length=20,blank=True)
+    type = models.CharField(max_length=20, choices=[(item.value, item.name) for item in ItemType])
     cover = CloudinaryField('cover', null=True,blank=True)
     dlcs = models.ManyToManyField(DLC, blank=True)
 
