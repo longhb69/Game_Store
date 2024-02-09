@@ -8,6 +8,10 @@ from django.utils.text import slugify
 from unidecode import unidecode 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import User
 
 #don't forget to specity app path. For example:
 #python manage.py makemigrations app
@@ -98,6 +102,7 @@ class Game(Item,Slug):
     developer = models.ForeignKey(Developer, on_delete=models.CASCADE, null=True, blank=True)
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, null=True, blank=True)
     specialColor = models.CharField(max_length=20, null=True, blank=True)
+    comments = GenericRelation('Comment', null=True, blank=True)
     
     os_min = models.CharField(max_length=50, verbose_name='Minimum OS', null=True, blank=True)
     os_rec = models.CharField(max_length=50, verbose_name='Recommended OS', null=True, blank=True)
@@ -128,6 +133,7 @@ class DLC(Item,Slug):
     developer = models.ForeignKey(Developer, on_delete=models.CASCADE, null=True, blank=True)
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, null=True, blank=True)
     specialColor = models.CharField(max_length=20, null=True, blank=True)
+    comments = GenericRelation('Comment', null=True, blank=True)
     
     os_min = models.CharField(max_length=50, verbose_name='Minimum OS', null=True, blank=True)
     os_rec = models.CharField(max_length=50, verbose_name='Recommended OS', null=True, blank=True)
@@ -163,6 +169,19 @@ class DLC(Item,Slug):
 class SpecialEditionGame(Item,Slug):
     base_game = models.ForeignKey(Game,on_delete=models.CASCADE,null=True,blank=True, related_name='base')
     dlcs = models.ManyToManyField(DLC,blank=True)
+    
+class Comment(models.Model): 
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    product = GenericForeignKey('content_type', 'object_id')
+    text = models.TextField(blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    recommended = models.BooleanField(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.user.username} comment on {self.product}"
 
 
 class DecoratorManager(models.Manager):

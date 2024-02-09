@@ -77,13 +77,13 @@ class LibaryView(APIView):
         }
         return Response(response_data)
 
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 class TransactionsView(APIView):
     pagination_class = StandardResultsSetPagination
     def get(self, request):
         paginator = self.pagination_class()
         user = request.user
-        #user = User.objects.get(username='tu')
+        user = User.objects.get(username='long')
         order = Order.objects.filter(user=user)
         serializer = OrderSerializer(order, many=True).data
         result_page = paginator.paginate_queryset(order, request)
@@ -105,6 +105,7 @@ def register(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
 
             
         

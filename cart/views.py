@@ -35,9 +35,9 @@ class CartView(APIView):
         game_id = request.data.get('game_id')
         user = request.user
         cart = get_object_or_404(Cart,user=user)
-        if type == 'game':
+        if type == ItemType.GAME.value:
             product = get_object_or_404(Game, id=game_id)
-        if type == 'dlc':
+        if type == ItemType.DLC.value:
             product = get_object_or_404(DLC, id=game_id)
 
         decorator = ConcreteComponent(product)

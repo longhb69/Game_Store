@@ -32,4 +32,3 @@ class LibaryItemSerializer(serializers.ModelSerializer):
             return GameSerializer(instance.product).data
         elif isinstance(instance.product, DLC):
             return DLCSerializer(instance.product).data
-

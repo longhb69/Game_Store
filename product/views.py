@@ -194,7 +194,10 @@ class SearchListView(generics.ListAPIView):
                 q = q.filter(category=category)
         serializer = GameSerializer(q, many=True).data
         return Response(serializer)
-        
+
+class CommentView(APIView):
+    def post(self, request):
+        pass
         
 # def add(request):
 #     if request.method == 'POST':

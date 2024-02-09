@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from rest_framework import reverse
-from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator,GameImage, GameVideo, Developer, Publisher
+from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator,GameImage, GameVideo, Developer, Publisher, Comment
 
 class CategorySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
@@ -146,6 +145,23 @@ class GameVideoSerializer(serializers.ModelSerializer):
     def get_video(self, instance):
         return instance.video.url
 
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField()
+    class Meta:
+        model = Comment
+        fields = [
+            'id',
+            'text',
+            'user',
+            'recommended',
+            'created_at',
+        ]
+    def get_user(self, instance):
+       return instance.user.username
+    def get_created_at(self, instance):
+        return instance.created_at.strftime("%d %B %Y").lstrip('0')
+        
 class GameDetailSerializer(serializers.ModelSerializer):
     video =  serializers.SerializerMethodField(read_only=True)
     videos = serializers.SerializerMethodField()
@@ -159,6 +175,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
     dlc = DLCSerializer(many=True, read_only=True, source='dlcs')
     special_edition = SpecialEditionGameSerializer(many=True, read_only=True, source='base')
     game_image = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
     class Meta:
         model = Game
         fields = '__all__'
@@ -180,6 +197,9 @@ class GameDetailSerializer(serializers.ModelSerializer):
     def get_year(self, instance):
         formatted_date = instance.year.strftime("%m/%d/%Y")
         return formatted_date
+    def get_comments(self, instance):
+        commments = instance.comments.all()
+        return CommentSerializer(commments, many=True).data
     
     def to_representation(self, instance):
         if isinstance(instance,DLC):

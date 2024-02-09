@@ -5,6 +5,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.signals import post_save,pre_save,post_delete
 from django.dispatch import receiver
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from product.models import Game,DLC
 
 
 class Libary(models.Model):
@@ -36,3 +39,7 @@ def create_user_libary(sender, instance, created, *args,**kwargs):
     if created and not Libary.objects.filter(user=instance).exists():
         Libary.objects.create(user=instance)
 
+
+
+    
+  
