@@ -148,12 +148,14 @@ class GameVideoSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
+    user_avatar = serializers.SerializerMethodField()
     class Meta:
         model = Comment
         fields = [
             'id',
             'text',
             'user',
+            'user_avatar',
             'recommended',
             'created_at',
         ]
@@ -161,6 +163,11 @@ class CommentSerializer(serializers.ModelSerializer):
        return instance.user.username
     def get_created_at(self, instance):
         return instance.created_at.strftime("%d %B %Y").lstrip('0')
+    def get_user_avatar(self, instance):
+        try:
+            return instance.user.avatar.image.url
+        except AttributeError:
+            return None
         
 class GameDetailSerializer(serializers.ModelSerializer):
     video =  serializers.SerializerMethodField(read_only=True)

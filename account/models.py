@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from product.models import Game,DLC
+from cloudinary.models import CloudinaryField
 
 
 class Libary(models.Model):
@@ -40,6 +41,12 @@ def create_user_libary(sender, instance, created, *args,**kwargs):
         Libary.objects.create(user=instance)
 
 
+class Avatar(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = CloudinaryField('avatar', null=True,blank=True)
+
+    def __str__(self):
+        return f"Avatar of {self.user.username}"
 
     
   
