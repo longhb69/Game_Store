@@ -17,5 +17,6 @@ urlpatterns = [
     path('api/newfeatured/', views.NewFeaturedView.as_view(), name='newfeatured'),
     path('api/developer/<str:slug>', views.DeveloperView.as_view(), name='developer'),
     path('search', views.SearchListView.as_view(), name='search'),
+    path('api/comment', views.CommentView.as_view(), name='comment'),
     
 ]

@@ -205,7 +205,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
         formatted_date = instance.year.strftime("%m/%d/%Y")
         return formatted_date
     def get_comments(self, instance):
-        commments = instance.comments.all()
+        commments = instance.comments.all().order_by('-created_at')
         return CommentSerializer(commments, many=True).data
     
     def to_representation(self, instance):

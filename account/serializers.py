@@ -6,9 +6,17 @@ from product.models import Game,DLC,SpecialEditionGame
 from product.serializers import GameSerializer, DLCSerializer
 
 class UserSerializer(serializers.ModelSerializer):
+    user_avatar = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = '__all__'
+    
+    def get_user_avatar(self, instance):
+        try:
+            if instance.avatar:
+                return instance.avatar.image.url
+        except AttributeError:
+            return None
         
     def create(self,validated_data):
         user = User.objects.create(

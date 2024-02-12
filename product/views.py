@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from .models import Category,Game,DLC,SpecialEditionGame,ConcreteComponent,DLCDecorator, Publisher
+from .models import Category,Game,DLC,SpecialEditionGame,ConcreteComponent,DLCDecorator, Publisher,Comment
 from django.http import JsonResponse
-from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer,SpecialEditionGameDetailSerializer
+from .serializers import CategorySerializer,GameSerializer,GameDetailSerializer,DLCSerializer,DLCDetailSerializer,SpecialEditionGameDetailSerializer, CommentSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework import status
@@ -12,6 +12,10 @@ from rest_framework import mixins
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from algoliasearch_django import algolia_engine
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
+from cart.models import ItemType
+from django.contrib.contenttypes.models import ContentType
 
 class CategoryPagination(PageNumberPagination):
    page_size = 4
@@ -195,9 +199,37 @@ class SearchListView(generics.ListAPIView):
         serializer = GameSerializer(q, many=True).data
         return Response(serializer)
 
+@permission_classes([IsAuthenticated])
 class CommentView(APIView):
     def post(self, request):
-        pass
+        try:
+            text = request.data.get('text')
+            recommended = request.data.get('recommended')
+            type = request.data.get("type")
+            game_id = request.data.get('game_id')
+            user = request.user
+            content_type = None
+            object_id = None
+            if type == ItemType.GAME.value:
+                game = Game.objects.get(id=game_id)
+                content_type = ContentType.objects.get_for_model(game)
+                object_id = game.id
+            elif type == ItemType.DLC.value:
+                dlc = DLC.objects.get(id=game_id)
+                content_type = ContentType.objects.get_for_model(dlc)
+                object_id = dlc.id
+                
+            comment = Comment.objects.create(
+                text=text,
+                recommended=recommended,
+                user=user,
+                content_type = content_type,
+                object_id = object_id
+            )
+            serializer = CommentSerializer(comment, many=False).data
+            return Response(serializer,status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return  Response({'error': str(e)}, status=500)
         
 # def add(request):
 #     if request.method == 'POST':
