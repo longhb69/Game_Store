@@ -77,7 +77,7 @@ class LibaryView(APIView):
         }
         return Response(response_data)
 
-#@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 class TransactionsView(APIView):
     pagination_class = StandardResultsSetPagination
     def get(self, request):

@@ -16,6 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
 from cart.models import ItemType
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 
 class CategoryPagination(PageNumberPagination):
    page_size = 4
@@ -31,7 +32,10 @@ class CategoryPagination(PageNumberPagination):
            'results': data
        })
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 5
+    page_size = 10
+
+class TwelvePerPagePagination(PageNumberPagination):
+    page_size = 12
 
 class NewFeaturedView(APIView):
     def get(self, request):
@@ -49,7 +53,7 @@ class CategoryMixinView(mixins.ListModelMixin,
                         GenericAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = CategoryPagination
+    pagination_class = TwelvePerPagePagination
     lookup_field = 'name'
     
     def get_object(self, category):
@@ -62,9 +66,11 @@ class CategoryMixinView(mixins.ListModelMixin,
     def get(self, request, *args, **kwargs):
         category = kwargs.get('slug')
         if category is not None:
-            instance = self.get_object(category)
-            serializer = GameSerializer(instance, many=True).data
-            return Response(serializer)
+            paginator = self.pagination_class()
+            games = self.get_object(category)
+            result_page = paginator.paginate_queryset(games, request)
+            serializer = GameSerializer(result_page, many=True).data
+            return paginator.get_paginated_response(serializer)
         return self.list(request, *args, **kwargs)
     
 class CategoryMixinView2(mixins.ListModelMixin,
@@ -97,9 +103,7 @@ def game_alt_view(request, slug=None, *args, **kwargs):
                 obj = get_object_or_404(Game, slug=slug)
                 data = GameDetailSerializer(obj,many=False).data
             except:
-                return Response("Game connot serializer")
-                #obj = get_object_or_404(SpecialEditionGame, slug=slug)
-                #data = SpecialEditionGameDetailSerializer(obj,many=False).data
+                return Response("Game cannot serializer")
             return Response(data)
         queryset = Game.objects.all()
         data = GameSerializer(queryset, many=True).data
@@ -201,7 +205,33 @@ class SearchListView(generics.ListAPIView):
 
 @permission_classes([IsAuthenticated])
 class CommentView(APIView):
-    def post(self, request):
+    pagination_class = StandardResultsSetPagination
+    
+    def get(self, request, type, id):
+        try:
+            paginator = self.pagination_class()
+            type = type 
+            game_id = id 
+            if type == ItemType.GAME.value:
+                game = Game.objects.get(id=game_id)
+                comments = Comment.objects.filter(
+                                            content_type=ContentType.objects.get_for_model(game),
+                                            object_id=game.id).order_by('-created_at')
+            elif type == ItemType.DLC.value:
+                dlc = DLC.objects.get(id=game_id)
+                comments = Comment.objects.filter(
+                                            content_type=ContentType.objects.get_for_model(dlc),
+                                            object_id=dlc.id).order_by('-created_at')
+            result_page = paginator.paginate_queryset(comments, request)
+            serializer = CommentSerializer(result_page, many=True).data
+            return paginator.get_paginated_response(serializer) 
+        
+        except ObjectDoesNotExist:
+            return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def post(self, request, id, type):
         try:
             text = request.data.get('text')
             recommended = request.data.get('recommended')
