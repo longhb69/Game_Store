@@ -163,7 +163,6 @@ h2.bb_tag {
 
 .swiper_slide {
     max-width: 1100px;
-    height: 590px;
     user-select: none;
 }
 
@@ -253,6 +252,7 @@ r .main-container,
 
 .carousel-swiper {
     height: 100%;
+    width: 100%;
     max-width: 1150px;
 }
 

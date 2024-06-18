@@ -29,14 +29,21 @@ class UserSerializer(serializers.ModelSerializer):
     
 class LibaryItemSerializer(serializers.ModelSerializer):
     product = serializers.SerializerMethodField(allow_null=True)
+    type = serializers.SerializerMethodField(allow_null=False)
     class Meta:
         model = LibaryItem
         fields = [
             'id',
-            'product'
+            'product',
+            'type'
         ]
     def get_product(self, instance):
         if isinstance(instance.product, Game):
             return GameSerializer(instance.product).data
         elif isinstance(instance.product, DLC):
             return DLCSerializer(instance.product).data
+    def get_type(self, instance):
+        if isinstance(instance.product, Game):
+            return "game"
+        elif isinstance(instance.product, DLC):
+            return "dlc"

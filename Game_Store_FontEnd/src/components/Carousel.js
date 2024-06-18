@@ -83,9 +83,9 @@ export default function Carousel(props) {
                 </div>
             : <>
                 {games && games.length > 0 ? 
-                    <div className='mb-[50px] h-[600px]'>
+                    <div className='mb-[50px] h-full w-full'>
                         <div className='flex w-full h-full'>
-                            <div className="relative w-full h-full">
+                            <div className="relative w-[80%] h-full">
                                 <Swiper
                                     ref={swiperRef}
                                     modules={[Autoplay]}
@@ -109,8 +109,8 @@ export default function Carousel(props) {
                                                     <div className={`absolute z-[1] left-[38px] w-[320px] bottom-[70px] flex flex-col items-start pointer-events-none transition-opacity duration-300 ease-in-out`}>
                                                         <div className='css-show game-name-show'>
                                                             <div>
-                                                                <div className={`game-logo show w-[280px] h-[200px]`} style={{ backgroundImage: `url('${game.logo}')` }}></div>
-                                                                <div className='mb-3 overflow-hidden break-words text-base text-[#fff]/[.9] leading-5 mb-2 font-bold'>
+                                                                <div className={`game-logo show w-[280px] h-[200px] md:w-[230px] md:h-[150px]`} style={{ backgroundImage: `url('${game.logo}')` }}></div>
+                                                                <div className='mb-3 overflow-hidden break-words text-base md:text-[13px] text-[#fff]/[.9] leading-5 font-base'>
                                                                     {game.overview_description}
                                                                 </div>
                                                             </div>
@@ -141,24 +141,24 @@ export default function Carousel(props) {
                                 })}
                                 </Swiper>
                             </div>
-                            <div className='ml-[30px] basis-1/4 max-h-[100%]'>
+                            <div className='ml-[20px] w-full max-h-[100%]'>
                                 <ul className='h-full w-full flex flex-col gap-1 relative'>
                                     {games.map((game, index) => {
                                         return (
-                                            <li className='rounded-2xl h-full flex overflow-hidden'>
+                                            <li className='rounded-2xl h-1/6 flex overflow-hidden'>
                                                 <div className='w-full h-full'>
                                                     <Link className='block w-full h-full'>
                                                         <div className={`carouselThumbnail ${index === activeSlide ? ' slide addbackground' : 'removebackground'} rounded-2xl relative h-full`}
                                                             onClick={(e) => Silde(index)}>
                                                             <div className='pr-[10px] w-full h-full relative flex justify-start  cursor-pointer items-center'>
-                                                                <div className='min-w-[60px] thumbnail-container mx-[15px] my-auto h-[74px] rounded-lg overflow-hidden z-[1]'>
+                                                                <div className='md:min-w-[40px] min-w-[60px] thumbnail-container mx-[15px] my-auto h-[74px] md:h-[50px] rounded-lg overflow-hidden z-[1]'>
                                                                     <div className='relative h-full'>
                                                                         <div className='items-center flex w-full h-full absolute overflow-hidden'>
-                                                                            <img className='thumbnail-image w-full h-full ' src={getResizeImage(game.cover, 60)}/>
+                                                                            <img className='thumbnail-image w-full h-full' src={getResizeImage(game.cover, 60)}/>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div className='font-medium text-[16px] z-[1] leading-6 items-center'>
+                                                                <div className='font-base text-[16px] md:text-[10px] z-[1] leading-6 items-center'>
                                                                     <div className='overflow-hidden'>{game.name}</div>
                                                                 </div>
                                                             </div>

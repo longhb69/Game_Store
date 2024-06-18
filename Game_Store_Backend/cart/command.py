@@ -44,6 +44,7 @@ class CreateOrderFromCartCommand:
                 game = Game.objects.get(slug=item.slug)
                 order.add_item(game)
                 libary.add_libary_item(order=order, product=game)
+
                 for dlc in item.dlcs.all():
                     dlc = DLC.objects.get(slug=dlc.slug)
                     order.add_item(dlc)
@@ -68,10 +69,18 @@ class CreateOrderCommand:
     item_type: ItemType
     def execute(self) -> Order:
         order = Order.objects.create(user=self.user, transaction_id=self.transaction_id)
+        item_slug = ""
         if self.item_type == ItemType.GAME:
             item = Game.objects.get(id=self.game_id)
+            item_slug = item.slug
         elif self.item_type == ItemType.DLC:
             item = DLC.objects.get(id=self.game_id)
+            item_slug = item.slug
+
+        cartItem = CartItem.objects.get(slug=item_slug)
+        if(cartItem):
+            cartItem.delete()
+
         libary = Libary.objects.get(user=self.user)
         order.add_item(item)
         libary.add_libary_item(order=order, product=item)

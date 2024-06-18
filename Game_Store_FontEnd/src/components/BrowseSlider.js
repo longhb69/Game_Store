@@ -16,7 +16,7 @@ export default function MostPopular(props) {
     init();
 
     function init() {
-        if(swiperRef.current?.swiper.slides.length < 6) {
+        if(swiperRef.current?.swiper.slides?.length < 6) {
             setBeginSlide(true);
             setEndSlide(true);
         }
@@ -159,10 +159,10 @@ export default function MostPopular(props) {
                                     <SwiperSlide>
                                         <div className="h-full w-full font-normal font-inter">
                                             <Link className=' flex flex-col w-full' to={'/app/' + game.slug}>
-                                                <div className='w-full h-[280px] rounded hover-affect relative'>
+                                                <div className='w-full h-[280px] md:h-[200px] rounded hover-affect relative'>
                                                     <img className='select-none w-full h-full rounded' src={game.cover} loading='lazy'/> 
                                                 </div>
-                                                <div className='text-base flex flex-col font-normal'>
+                                                <div className='text-base md:text-[12px] flex flex-col font-normal'>
                                                     <div className='overflow-hidden mt-2'>{game.name}</div>
                                                     <div className='flex items-center mt-1'>
                                                         <div>{game.price}<span className="underline">đ</span></div>

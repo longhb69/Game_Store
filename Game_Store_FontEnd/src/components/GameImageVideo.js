@@ -98,7 +98,7 @@ export default function GameImageVideo(props) {
                               </SwiperSlide>
                           ))
                         : null}
-                    <button className="w-[18px] h-[18px] pb-10 swiper-button-next" onClick={() => main_next()}>
+                    <button className="w-[18px] h-[18px] swiper-button-next" onClick={() => main_next()}>
                         <span className="">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 9">
                                 <path stroke="currentColor" d="M1 1l3 3.5L1 8" fill="none" fill-rule="evenodd"></path>
@@ -121,7 +121,7 @@ export default function GameImageVideo(props) {
                 ) : (
                     <div></div>
                 )}
-                <div className="max-w-[800px]">
+                <div className="max-w-[800px] md:w-[600px]">
                     {props.game_image && props.game_image.length > 0 ? (
                         <Swiper
                             ref={miniSwiperRef}
@@ -142,9 +142,9 @@ export default function GameImageVideo(props) {
                                         src={props.image}
                                         className={`${
                                             currentSlide === 0 ? 'border border-[#fff] opacity-[1]' : 'opacity-[0.6]'
-                                        } hover:opacity-[1] cursor-pointer max-w-[180px] h-[80px] transition-opacity ease-in-out duration-[450ms]`}
-                                        loading="lazy"></img>
-                                    <div className="z-[1] absolute h-[20px] top-[30px] left-[82px] w-[20px]">
+                                        } hover:opacity-[1] cursor-pointer max-w-[180px] h-[80px] md:h-[60px] transition-opacity ease-in-out duration-[450ms]`}
+                                        loading="lazy"/>
+                                    <div className="z-[1] absolute h-[20px] top-[30px] left-[82px] w-[20px] md:top-[15px] md:left-[50px]">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="svg css-uwwqev" viewBox="0 0 11 14">
                                             <path d="M0 0v14l11-7z" fill="#8F32db" fill-rule="nonzero"></path>
                                         </svg>
@@ -154,12 +154,12 @@ export default function GameImageVideo(props) {
                             {props.game_image && props.game_image.length > 0
                                 ? props.game_image.map((image, index) => (
                                       <SwiperSlide style={{ width: '200px', borderRadius: '4px' }} key={index}>
-                                          <div className={`h-full rounded`} onClick={() => changeSlide(index + 1)}>
+                                          <div className={`h-full  rounded`} onClick={() => changeSlide(index + 1)}>
                                               <img
                                                   src={getResizeImage(image.image, 142)}
                                                   className={`rounded ${
                                                       index === currentSlide - 1 ? 'border border-[#fff] opacity-[1]' : 'opacity-[0.6]'
-                                                  }  hover:opacity-[1]  cursor-pointer  max-w-[180px] h-[80px] transition-opacity ease-in-out duration-[450ms]`}></img>
+                                                  }  hover:opacity-[1]  cursor-pointer  max-w-[180px] h-[80px] md:h-[60px] transition-opacity ease-in-out duration-[450ms]`}></img>
                                           </div>
                                       </SwiperSlide>
                                   ))

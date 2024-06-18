@@ -153,7 +153,7 @@ export default function DLCDetail() {
                     {game ? (
                         <>
                             <div className={`mx-auto w-[75%] mt-2 text-nowrap overlay ${buttonBuyNow ? '' : 'active'}`}>
-                                <div className="text-white text-6xl mb-2 mt-8">{game.name}</div>
+                                <div className="text-white text-6xl md:text-4xl mb-2 mt-8">{game.name}</div>
                                 <div className="flex">
                                     <div className="w-[75%] mt-5">
                                         <div className="w-[calc(100%)] ">
@@ -183,7 +183,7 @@ export default function DLCDetail() {
                                         </div>
                                         <div className="flex mt-5 w-full">
                                             <div className="w-full">
-                                                <h2 className="text-lg border-b">ABOUT THIS GAME</h2>
+                                                <h2 className="text-lg md:text-sm border-b">ABOUT THIS GAME</h2>
                                                 <p
                                                     className="mt-5"
                                                     dangerouslySetInnerHTML={{
@@ -192,16 +192,16 @@ export default function DLCDetail() {
                                             </div>
                                         </div>
                                     </div>
-                                    <aside className="max-w-[350px]">
+                                    <aside className="max-w-[350px] text-base md:text-sm">
                                         <div className="flex sticky top-[100px] mt-5 flex-nowrap w-full">
                                             <div className=" text-white ml-7 w-[100%]">
                                                 <div className="mb-3 ">
                                                     <img className="rounded" src={game.image} />
                                                 </div>
                                                 <div className="mb-3 text-nowrap">
-                                                    <p className="text-white text-base">{game.overview_description}</p>
+                                                    <p className="text-white">{game.overview_description}</p>
                                                 </div>
-                                                <div className="text-nowrap	text-base">
+                                                <div className="text-nowrap">
                                                     <div className="flex flex-nowrap pb-2 border-b border-[#fff]/[.1]">
                                                         <span className="basis-2/5 text-[#aaae]">RELEASE DATE</span>
                                                         <span className="basis-3/5 text-end">{game.year}</span>
@@ -219,7 +219,7 @@ export default function DLCDetail() {
                                                         </a>
                                                     </div>
                                                 </div>
-                                                <div className="text-base flex flex-col">
+                                                <div className="flex flex-col">
                                                     <div className="mt-1 text-lg">
                                                         <p>
                                                             {game.price}

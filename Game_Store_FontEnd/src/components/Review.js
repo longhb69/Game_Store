@@ -83,7 +83,7 @@ export default function Review(props) {
                     </div>
                 </div>
             :
-            <div className="flex flex-col w-full overflow-hidden">
+            <div className="flex flex-col w-full overflow-hidden md:text-xs">
                 <div className="mt-11 w-full">
                     <div className="w-full h-full relative flex flex-col justify-between">
                         <div className="w-full relative">
@@ -115,7 +115,7 @@ export default function Review(props) {
                                                                     <span className="transition">{renderScore(review.score, review.npScore, review.ScoreFormat)}</span>
                                                                 </div>
                                                                 <div className="my-5 w-full">
-                                                                    <span className="transition text-base font-normal text-[#fff]/[.6]">"{review?.snippet}"</span>
+                                                                    <span className="transition font-normal text-[#fff]/[.6]">"{review?.snippet}"</span>
                                                                 </div>
                                                             </div>
                                                             <div className="uppercase mt-auto">
@@ -124,9 +124,9 @@ export default function Review(props) {
                                                                         <span className="transition text-[#fff]/[.6]">
                                                                             <span>
                                                                                 read full review
-                                                                                <span className="ml-2 inline-block relative h-4 top-[2px] w-[12px]">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="svg css-uwwqev" viewBox="0 0 12 12"><path d="M9.50362 1.91667H7.70201V0.75H11.5894V4.4621H10.3676V2.74154L6.49554 6.43883L5.63166 5.61385L9.50362 1.91667Z" fill="currentColor"></path><path d="M2.43668 1.9697C2.09366 1.9697 1.8155 2.23532 1.8155 2.56288V9.49013C1.8155 9.81769 2.09366 10.0833 2.43668 10.0833H9.69097C10.034 10.0833 10.3122 9.81769 10.3122 9.49013V6.02636H11.5339V9.49013C11.5339 10.462 10.7088 11.25 9.69097 11.25H2.43668C1.41891 11.25 0.59375 10.462 0.59375 9.49013V2.56288C0.59375 1.59099 1.41891 0.803032 2.43668 0.803032H6.06398V1.9697H2.43668Z" fill="currentColor"></path></svg>
-                                                                                </span>
+                                                                            </span>
+                                                                            <span className="ml-1 inline-block relative w-[12px]">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" class="svg" viewBox="0 0 12 12"><path d="M9.50362 1.91667H7.70201V0.75H11.5894V4.4621H10.3676V2.74154L6.49554 6.43883L5.63166 5.61385L9.50362 1.91667Z" fill="currentColor"></path><path d="M2.43668 1.9697C2.09366 1.9697 1.8155 2.23532 1.8155 2.56288V9.49013C1.8155 9.81769 2.09366 10.0833 2.43668 10.0833H9.69097C10.034 10.0833 10.3122 9.81769 10.3122 9.49013V6.02636H11.5339V9.49013C11.5339 10.462 10.7088 11.25 9.69097 11.25H2.43668C1.41891 11.25 0.59375 10.462 0.59375 9.49013V2.56288C0.59375 1.59099 1.41891 0.803032 2.43668 0.803032H6.06398V1.9697H2.43668Z" fill="currentColor"></path></svg>
                                                                             </span>
                                                                         </span>
                                                                     </a>

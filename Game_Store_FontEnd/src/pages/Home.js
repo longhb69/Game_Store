@@ -44,6 +44,8 @@ export default function Home() {
         })
     }
     useEffect(() => {
+        window.history.scrollRestoration = 'manual';
+        window.scrollTo(0,0)
         const options = {
             threshold: 0.6,
         }
@@ -53,6 +55,9 @@ export default function Home() {
                 observer.observe(ref.current)
             }
         })
+        return () => {
+            window.history.scrollRestoration = 'auto';
+          };
     }, [])
 
     return (

@@ -14,7 +14,7 @@ export default function Library() {
 
     useEffect(() => {
         const newUrl = tags && tags.length > 0 ? `${baseUrl}api/account/libary?q=${query}&tag=${tags}` : `${baseUrl}api/account/libary?q=${query}`
-
+        console.log(games)
         setUrl(newUrl)
     }, [tags, query])
 
@@ -174,7 +174,8 @@ export default function Library() {
                                                                                         slug={game.product.slug}
                                                                                         cover={game.product.cover}
                                                                                         name={game.product.name}
-                                                                                        //price={item.product.price}
+                                                                                        type={game.type}
+                                                                                        price={game.product.price}
                                                                                     />
                                                                                 </div>
                                                                             </li>
