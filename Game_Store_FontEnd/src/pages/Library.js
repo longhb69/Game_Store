@@ -1,53 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import axios from 'axios'
 import { baseUrl } from '../shared'
+import useFetchData from '../useFetchData'
 import FilterGame from '../components/FilterGame'
+import { useEffect, useState } from 'react'
 
-export default function Search() {
-    const params = useParams()
-    const [games, setGames] = useState()
-    const [categories, setCategories] = useState([])
+export default function Library() {
+    const [url, setUrl] = useState(`${baseUrl}api/account/libary`)
+    const { data: games, loading, error, refetch, categories } = useFetchData(url, localStorage.getItem('access'))
     const [btnActive, setBtnActive] = useState(false)
-    const [loading, setLoading] = useState(true)
     const [tags, setTags] = useState([])
     const [tagIds, setTagIds] = useState([])
-    const [query2, setQuery] = useState(params.q)
-    const inputRef = useRef()
-    const loadingItems = Array.from({ length: 10 })
+    const [query, setQuery] = useState('')
     const [isPressed, setIsPressed] = useState(false)
 
-    const getData = (query = '') => {
-        setLoading(true)
-        const url = tags && tags.length > 0 ? `${baseUrl}search?q=${query}&tag=${tags}` : `${baseUrl}search?q=${query}`
+    useEffect(() => {
+        const newUrl = tags && tags.length > 0 ? `${baseUrl}api/account/libary?q=${query}&tag=${tags}` : `${baseUrl}api/account/libary?q=${query}`
 
-        axios
-            .get(url)
-            .then((response) => {
-                setGames(response.data)
-                setTimeout(() => {
-                    setLoading(false)
-                }, 1000)
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error)
-            })
-    }
-    let searchData = (query2 = params.q) => {
-        getData(query2)
-    }
-    useEffect(() => {
-        axios.get(`${baseUrl}api/category2/`).then((response) => {
-            setCategories(response.data)
-        })
-    }, [])
-    useEffect(() => {
-        getData(query2)
-    }, [tags])
-    useEffect(() => {
-        getData(params.q)
-        setQuery(params.q)
-    }, [params])
+        setUrl(newUrl)
+    }, [tags, query])
 
     function filter(game_name, id) {
         if (tagIds.includes(id)) {
@@ -61,10 +30,6 @@ export default function Search() {
     const handleInputChange = (event) => {
         setQuery(event.target.value)
     }
-    useEffect(() => {
-        searchData(query2)
-    }, [query2])
-
     const handlePress = () => {
         setIsPressed(true)
         setTimeout(() => {
@@ -73,14 +38,17 @@ export default function Search() {
     }
     return (
         <>
-            <div className="w-[75%] h-[1450px] mx-auto max-w-[1600px]">
-                <div className="pb-20">
+            <div className="w-[75%] mx-auto my-8 ">
+                <div className="flex items-center text-5xl">
+                    <h1>Library</h1>
+                </div>
+                <div className="pb-20 ">
                     <section className="h-full">
                         <div className="flex w-full max-w-[none]">
                             <div className="flex flex-row-reverse w-full h-full text-base">
-                                <aside className="w-[280px] shrink-0 mt-5">
+                                <aside className="w-[280px] shrink-0">
                                     <div className="w-full overflow-hidden">
-                                        <div>
+                                        <div className="mb-2">
                                             <div className="flex h-[54px] justify-between pt-2 flex items-center">
                                                 <div className="">Filters ({tagIds.length})</div>
                                                 <button
@@ -118,8 +86,7 @@ export default function Search() {
                                                         </svg>
                                                     </span>
                                                     <input
-                                                        ref={inputRef}
-                                                        value={query2}
+                                                        value={query}
                                                         onChange={handleInputChange}
                                                         type="text"
                                                         placeholder="Keywords"
@@ -165,7 +132,7 @@ export default function Search() {
                                             <div className={`${btnActive ? '' : 'hidden'} transition`}>
                                                 {categories ? (
                                                     <>
-                                                        {categories.map((category, index) => {
+                                                        {categories.map(([category, count], index) => {
                                                             return (
                                                                 <div>
                                                                     <div>
@@ -174,9 +141,11 @@ export default function Search() {
                                                                                 tagIds.includes(index) ? 'bg-[#fff]/[0.1] opacity-[1]' : ''
                                                                             } hover:opacity-[1] cursor-pointer`}
                                                                             onClick={(e) => {
-                                                                                filter(category.name, index)
+                                                                                filter(category, index)
                                                                             }}>
-                                                                            <div>{category.name}</div>
+                                                                            <div>
+                                                                                {category} <span>({count})</span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -188,62 +157,45 @@ export default function Search() {
                                         </div>
                                     </div>
                                 </aside>
-                                <div className="pr-4 w-[calc(100%-280px)] mt-5">
+                                <div className="pr-4 w-[calc(100%-280px)]">
                                     <section className="h-full">
                                         <div className="m-w-[none] h-full mx-auto">
-                                            {loading ? (
-                                                <section className="h-full">
-                                                    <section className="mb-4 w-full mt-5">
-                                                        <ul className="list-none content-stretch flex flex-wrap w-full items-stretch gap-10">
-                                                            {loadingItems.map((item) => (
-                                                                <li className="mb-[90px] transition ease-in-out duration-[125ms] w-[calc(25%-65px)] max-h-[300px] min-w-[200px]">
-                                                                    <div className="rounded w-full h-[270px] skeleton"></div>
-                                                                    <div className="mt-5 rounded-md w-full h-[20px] skeleton rounded-md"></div>
-                                                                    <div className="mt-2 w-full h-[20px]  skeleton rounded-md"></div>
-                                                                    <div className="mt-5 w-[30%] h-[20px] mr-auto skeleton rounded-md"></div>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </section>
-                                                </section>
-                                            ) : (
-                                                <section className="h-full">
-                                                    {games && games.length > 0 ? (
-                                                        <>
-                                                            <section className="mb-4 w-full mt-5">
-                                                                <ul className="list-none content-stretch flex flex-wrap w-full items-stretch gap-4">
-                                                                    {games.map((game) => {
-                                                                        return (
-                                                                            <>
-                                                                                <li className="mb-[48px] transition ease-in-out duration-[125ms] w-[calc(25%-65px)] max-h-[300px] min-h-[150px] min-w-[112px]">
-                                                                                    <div>
-                                                                                        <FilterGame
-                                                                                            slug={game.slug}
-                                                                                            cover={game.cover}
-                                                                                            name={game.name}
-                                                                                            price={game.price}
-                                                                                        />
-                                                                                    </div>
-                                                                                </li>
-                                                                            </>
-                                                                        )
-                                                                    })}
-                                                                </ul>
-                                                            </section>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <div className="flex flex-col h-full">
-                                                                <div className="flex flex-col items-center justify-center text-center h-auto">
-                                                                    <div className="mt-10 text-5xl">
-                                                                        <span>No results found</span>
-                                                                    </div>
+                                            <section className="h-full">
+                                                {games && games.length > 0 ? (
+                                                    <>
+                                                        <section className="mb-4 w-full mt-5">
+                                                            <ul className="list-none content-stretch flex flex-wrap w-full items-stretch gap-x-5 gap-y-8">
+                                                                {games.map((game) => {
+                                                                    return (
+                                                                        <>
+                                                                            <li className="mb-[48px] transition ease-in-out duration-[125ms] w-[calc(25%-75px)] max-h-[300px] min-h-[150px] min-w-[112px]">
+                                                                                <div>
+                                                                                    <FilterGame
+                                                                                        slug={game.product.slug}
+                                                                                        cover={game.product.cover}
+                                                                                        name={game.product.name}
+                                                                                        //price={item.product.price}
+                                                                                    />
+                                                                                </div>
+                                                                            </li>
+                                                                        </>
+                                                                    )
+                                                                })}
+                                                            </ul>
+                                                        </section>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="flex flex-col h-full">
+                                                            <div className="flex flex-col items-center justify-center text-center h-auto">
+                                                                <div className="mt-10 text-5xl">
+                                                                    <span>No results found</span>
                                                                 </div>
                                                             </div>
-                                                        </>
-                                                    )}
-                                                </section>
-                                            )}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </section>
                                         </div>
                                     </section>
                                 </div>
