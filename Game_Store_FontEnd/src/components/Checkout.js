@@ -33,9 +33,9 @@ export default function Checkout(props) {
             Checkout(url);
         }
         else {
-            const url = baseUrl + 'cart/checkout'
-            const data = {type:props.type, game_id: props.game.id}
-            Checkout(url,data)
+            //const url = baseUrl + 'cart/checkout'
+            //const data = {type:props.type, game_id: props.game.id, }
+            //Checkout(url,data)
         }
     }
     return (props.trigger ? (
