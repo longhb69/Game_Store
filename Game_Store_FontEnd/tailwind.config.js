@@ -2,6 +2,18 @@
 module.exports = {
     content: ['./src/**/*.{html,js}'],
     theme: {
+        screens: {
+            sm20: '20px',
+            sm30: '30px',
+            sm40: '40px',
+            sm50: '50px',
+            sm60: '60px',
+            sm200: '200px',
+            sm: '480px',
+            md: '768px',
+            lg: '976px',
+            xl: '1440px',
+        },
         extend: {
             colors: {
                 dark: '#121212',

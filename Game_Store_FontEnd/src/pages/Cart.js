@@ -94,7 +94,7 @@ export default function Cart() {
     }
     return (
         <>
-            <div className={`mx-auto w-[70%] mt-10 overlay ${buttonCheckout ? '' : 'active'} mb-[100px]`}>
+            <div className={`mx-auto w-[70%] h-screen mt-10 overlay ${buttonCheckout ? '' : 'active'} mb-[100px]`}>
                 <div className="mb-12">
                     <h1>
                         <span className="text-5xl">Your Shopping Cart</span>

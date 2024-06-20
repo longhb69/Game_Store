@@ -1,6 +1,7 @@
 import { useContext, useState, createContext, useEffect, useCallback } from 'react'
 import { baseUrl } from './shared'
 import axios from 'axios'
+import { jwtDecode } from 'jwt-decode'
 
 const LoginContext = createContext()
 const AccountContext = createContext()
@@ -30,7 +31,7 @@ export function LoginProvider({ children }) {
         }
     }
     const getCartQuantity = useCallback(() => {
-        if (loggedIn) {
+        if (loggedIn && validateToken(localStorage.access)) {
             const url = baseUrl + 'cart/quantity'
             axios
                 .get(url, {
@@ -48,7 +49,7 @@ export function LoginProvider({ children }) {
         }
     })
     const getItemInCart = useCallback(() => {
-        if (loggedIn) {
+        if (loggedIn && validateToken(localStorage.access)) {
             const url2 = baseUrl + 'cart/item-in-cart'
             axios
                 .get(url2, {
@@ -67,8 +68,8 @@ export function LoginProvider({ children }) {
         }
     })
     const getLibrary = useCallback(() => {
-        const url3 = baseUrl + 'api/account/game_in_libary'
-        if (localStorage.access) {
+        if (localStorage.access && validateToken(localStorage.access)) {
+            const url3 = baseUrl + 'api/account/game_in_libary'
             axios
                 .get(url3, {
                     headers: {
@@ -85,29 +86,58 @@ export function LoginProvider({ children }) {
         }
     })
 
-    useEffect(() => {
-        function refreshTokens() {
-            if (localStorage.refresh) {
-                const url = baseUrl + 'api/token/refresh/'
-                axios
-                    .post(url, {
-                        refresh: localStorage.refresh,
-                    })
-                    .then((response) => {
-                        localStorage.access = response.data.access
-                        localStorage.refresh = response.data.refresh
-                        setAccount(localStorage.account)
-                        setLoggedIn(true)
-                    })
-                    .catch((error) => {
-                        console.error('Error refreshing token:', error)
-                    })
+    const validateToken = (token) => {
+        try {
+            const decoded = jwtDecode(token)
+            const now = Date.now().valueOf() / 1000
+            if (decoded.exp < now) {
+                return false
             }
+            return true
+        } catch (error) {
+            return false
         }
+    }
+
+    const refreshTokens = async () => {
+        if (localStorage.refresh) {
+            try {
+                const url = baseUrl + 'api/token/refresh/'
+                const response = await axios.post(url, {
+                        refresh: localStorage.refresh,
+                })
+                localStorage.access = response.data.access
+                localStorage.refresh = response.data.refresh
+                setAccount(localStorage.account)
+                setLoggedIn(true)
+            } catch(e) {
+                console.error('Error refreshing token:', e)
+                changeLoggedIn(false)
+            }
+        } 
+        else
+        {
+            changeLoggedIn(false)
+        }
+    } 
+
+    useEffect(() => {
+        const init = async () => {
+            if(localStorage.access && validateToken(localStorage.access)) {
+                setAccount(localStorage.account)
+                setLoggedIn(true)
+            } else if (localStorage.refresh) {
+                await refreshTokens()
+            } else {
+                changeLoggedIn(false)
+            }
+            getCartQuantity()
+            getLibrary()
+        }
+
+        init()
+        
         const minute = 1000 * 60
-        refreshTokens()
-        getCartQuantity()
-        getLibrary()
         const intervalId = setInterval(() => {
             refreshTokens()
         }, minute * 3)
