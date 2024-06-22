@@ -212,7 +212,7 @@ export default function GameDetail() {
                     {game && (
                         <>
                             <div className={`mx-auto w-[75%] mt-2 text-nowrap overlay mb-10  ${buttonBuyNow ? '' : 'active'}`}>
-                                <div className="text-white text-6xl md:text-4xl mb-2 mt-8">{game.name}</div>
+                                <div className="text-white text-6xl mb-2 mt-8 game-title">{game.name}</div>
                                 <div className="flex">
                                     <div className="w-[75%] mt-5">
                                         <div className="w-[calc(100%)] ">
@@ -360,7 +360,7 @@ export default function GameDetail() {
                                             </div>
                                         </div>
                                     </div>
-                                    <aside className="max-w-[350px] md:text-[13px]">
+                                    <aside className="max-w-[350px] laptop">
                                         <div className="flex sticky top-[100px] mt-5 flex-nowrap w-full">
                                             <div className="text-white ml-7 w-[100%] ">
                                                 <div className="mb-3 ">

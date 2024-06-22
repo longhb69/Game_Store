@@ -88,7 +88,7 @@ export default function Comments(props) {
                             <h2 className="text-xl mb-3">Write a review for {props.game}</h2>
                             <div className="flex">
                                 <div className="flex basis-[10%]">
-                                    <div className="w-[80px] h-[80px] relative bg-gradient-to-r from-[#5532db] to-[#32db55]">
+                                    <div className="w-[80px] h-[80px] user-avatar mr-3.5 relative bg-gradient-to-r from-[#5532db] to-[#32db55]">
                                         {account ? <img className="w-full h-full p-[2px]" src={account.user_avatar} alt="avatar" /> : null}
                                     </div>
                                 </div>

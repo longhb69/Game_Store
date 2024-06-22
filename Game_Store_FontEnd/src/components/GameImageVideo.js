@@ -142,7 +142,7 @@ export default function GameImageVideo(props) {
                                         src={props.image}
                                         className={`${
                                             currentSlide === 0 ? 'border border-[#fff] opacity-[1]' : 'opacity-[0.6]'
-                                        } hover:opacity-[1] cursor-pointer max-w-[180px] h-[80px] md:h-[60px] transition-opacity ease-in-out duration-[450ms]`}
+                                        } hover:opacity-[1] cursor-pointer max-w-[180px] swiper-image h-[60px] transition-opacity ease-in-out duration-[450ms]`}
                                         loading="lazy"/>
                                     <div className="z-[1] absolute h-[20px] top-[30px] left-[82px] w-[20px] md:top-[15px] md:left-[50px]">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="svg css-uwwqev" viewBox="0 0 11 14">
@@ -159,7 +159,7 @@ export default function GameImageVideo(props) {
                                                   src={getResizeImage(image.image, 142)}
                                                   className={`rounded ${
                                                       index === currentSlide - 1 ? 'border border-[#fff] opacity-[1]' : 'opacity-[0.6]'
-                                                  }  hover:opacity-[1]  cursor-pointer  max-w-[180px] h-[80px] md:h-[60px] transition-opacity ease-in-out duration-[450ms]`}></img>
+                                                  }  hover:opacity-[1]  cursor-pointer  max-w-[180px] h-[60px] swiper-image transition-opacity ease-in-out duration-[450ms]`}></img>
                                           </div>
                                       </SwiperSlide>
                                   ))

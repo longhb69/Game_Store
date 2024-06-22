@@ -110,7 +110,7 @@ export default function Carousel(props) {
                                                         <div className='css-show game-name-show'>
                                                             <div>
                                                                 <div className={`game-logo show w-[280px] h-[200px] md:w-[230px] md:h-[150px]`} style={{ backgroundImage: `url('${game.logo}')` }}></div>
-                                                                <div className='mb-3 overflow-hidden break-words text-base md:text-[13px] text-[#fff]/[.9] leading-5 font-base'>
+                                                                <div className='mb-3 overflow-hidden break-words text-base text-[#fff]/[.9] leading-5 font-base laptop'>
                                                                     {game.overview_description}
                                                                 </div>
                                                             </div>
@@ -151,14 +151,14 @@ export default function Carousel(props) {
                                                         <div className={`carouselThumbnail ${index === activeSlide ? ' slide addbackground' : 'removebackground'} rounded-2xl relative h-full`}
                                                             onClick={(e) => Silde(index)}>
                                                             <div className='pr-[10px] w-full h-full relative flex justify-start  cursor-pointer items-center'>
-                                                                <div className='sm60:min-w-[40px] md:min-w-[60px] thumbnail-container mx-[15px] my-auto md:h-[74px] sm60:h-[50px] rounded-lg overflow-hidden z-[1]'>
+                                                                <div className='min-w-[60px] thumbnail-container mx-[15px] my-auto h-[74px] rounded-lg overflow-hidden z-[1]'>
                                                                     <div className='relative h-full'>
                                                                         <div className='items-center flex w-full h-full absolute overflow-hidden'>
                                                                             <img className='thumbnail-image w-full h-full' src={getResizeImage(game.cover, 60)}/>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div className='font-base md:text-[16px] sm200:text-[10px] z-[1] leading-6 items-center'>
+                                                                <div className='font-base text-[16px] z-[1] leading-6 items-center laptop'>
                                                                     <div className='overflow-hidden'>{game.name}</div>  
                                                                 </div>
                                                             </div>

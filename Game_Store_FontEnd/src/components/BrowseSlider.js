@@ -159,7 +159,7 @@ export default function MostPopular(props) {
                                     <SwiperSlide>
                                         <div className="h-full w-full font-normal font-inter">
                                             <Link className=' flex flex-col w-full' to={'/app/' + game.slug}>
-                                                <div className='w-full md:h-[280px] sm:h-[200px] rounded hover-affect relative'>
+                                                <div className='w-full h-[280px] rounded hover-affect relative slider-image'>
                                                     <img className='select-none w-full h-full rounded' src={game.cover} loading='lazy'/> 
                                                 </div>
                                                 <div className='md:text-base sm:text-[12px] flex flex-col font-normal'>

@@ -83,7 +83,7 @@ export default function Review(props) {
                     </div>
                 </div>
             :
-            <div className="flex flex-col w-full overflow-hidden md:text-xs">
+            <div className="flex flex-col w-full overflow-hidden laptop">
                 <div className="mt-11 w-full">
                     <div className="w-full h-full relative flex flex-col justify-between">
                         <div className="w-full relative">

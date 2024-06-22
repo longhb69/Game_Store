@@ -75,10 +75,10 @@ export default function Home() {
             ) : (
                 <div>
                     <div
-                        className={`section-load w-[75%] mx-auto min-h-[350px] bg-gradient-to-r from-[#0d1042] to-[#792844] mt-8 pb-4 mb-5 rounded-xl border-2`}>
+                        className={`section-load w-[75%] mx-auto min-h-[350px] developer-container bg-gradient-to-r from-[#0d1042] to-[#792844] mt-8 pb-4 mb-5 rounded-xl border-2`}>
                         <DeveloperSlider url={DeveloperUrl3} logo={EAlogo} />
                     </div>
-                    <div className={`w-[75%] mx-auto min-h-[350px] rounded-xl border-2`} style={{ backgroundImage: `url('${PSBg}')` }}>
+                    <div className={`w-[75%] mx-auto min-h-[350px] developer-container rounded-xl border-2`} style={{ backgroundImage: `url('${PSBg}')` }}>
                         <DeveloperSlider url={DeveloperUrl2} logo={PSlogo} />
                     </div>
                 </div>
@@ -89,7 +89,7 @@ export default function Home() {
             <div className="p-7 w-[75%] mx-auto">
                 <BrowseSlider url={PicksForYouUrl} title={'Picks for you'} linkable={false} slideperview={6} />
             </div>
-            <div className="section-load w-[75%] mx-auto mt-8 pb-4 min-h-[350px] rounded-xl border-2" style={{ backgroundImage: `url('${UbiBg}')` }}>
+            <div className="section-load w-[75%] mx-auto mt-8 pb-4 min-h-[350px] developer-container rounded-xl border-2" style={{ backgroundImage: `url('${UbiBg}')` }}>
                 {loading[1] ? (
                     <div ref={lazyLoadRefs[1]} className=" mx-auto flex justify-center my-10">
                         <Lottie className="h-[60px] w-[60px]" animationData={animationData} loop={true} />

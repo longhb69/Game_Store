@@ -151,11 +151,11 @@ class Payment(APIView):
         endpoint = "https://test-payment.momo.vn/v2/gateway/api/create"
         orderInfo = "pay with MoMo"
         partnerCode = "MOMO"
-        redirectUrl = "https://0763-2405-4802-3c4c-37b0-253d-6183-1544-df39.ngrok-free.app/cart/callback"
+        redirectUrl = "https://2412-2405-4802-3c4c-37b0-5a8-3b06-d4df-83ee.ngrok-free.app/payment"
         ipnUrl = "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b"
         amount = request.data.get("amount")
-        orderId = str(uuid.uuid4())
-        requestId = str(uuid.uuid4())
+        orderId = request.data.get("orderId")
+        requestId = request.data.get("orderId")
         extraData = ""  # pass empty value or Encode base64 JsonString
         partnerName = "MoMo Payment"
         requestType = "captureWallet"
@@ -172,14 +172,9 @@ class Payment(APIView):
                     + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl\
                     + "&requestId=" + requestId + "&requestType=" + requestType
 
-        # puts raw signature
-        print("--------------------RAW SIGNATURE----------------")
-        print(rawSignature)
-        # signature
+        
         h = hmac.new(bytes(secretKey, 'ascii'), bytes(rawSignature, 'ascii'), hashlib.sha256)
         signature = h.hexdigest()
-        print("--------------------SIGNATURE----------------")
-        print(signature)
 
         # json object send to MoMo endpoint
         data = {
@@ -200,11 +195,9 @@ class Payment(APIView):
             'orderGroupId': orderGroupId
         }
 
-        print("--------------------JSON REQUEST----------------\n")
         data = json.dumps(data)
-        print(data)
-
         clen = len(data)
+
         try:
             response = requests.post(endpoint, data=data, headers={'Content-Type': 'application/json', 'Content-Length': str(clen)})
             return Response(response.json(), status=status.HTTP_200_OK)
@@ -214,7 +207,20 @@ class Payment(APIView):
 class Callback(APIView):
     def get(self, request):
         try:
-            callback_data = request.data
+            print('callback')
+            callback_data = request.query_params.dict()
+            print(callback_data.get('resultCode'))
+            print(callback_data.get('message'))
+            if callback_data.get('resultCode') == 0:
+                print('')
+                webhook_url = 'http://localhost:3000/webhook-order'
+                webhook_data = {
+                    'orderId': callback_data.get('orderId'),
+                    'message': callback_data.get('message')
+                } 
+                data = json.dumps(webhook_data)
+                clen = len(data)
+                response = requests.post(webhook_url, json=webhook_data)
             return Response(callback_data, status=status.HTTP_200_OK)
         except:
             return Response({"error": "Failed to process callback"}, status=500)
@@ -233,14 +239,18 @@ class TransactionStatus(APIView):
             "signature": signature,
             "lang": "vi"
         }
+
         data = json.dumps(data)
         print(data)
         clen = len(data)
-        #try:
-        response = requests.post(endpoint, data=data, headers={'Content-Type': 'application/json', 'Content-Length': str(clen)})
-        return Response(response.json(), status=status.HTTP_200_OK)
-        #except:
-        #    return Response({"message": "Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            response = requests.post(endpoint, data=data, headers={'Content-Type': 'application/json', 'Content-Length': str(clen)})
+            return Response(response.json(), status=status.HTTP_200_OK)
+        except:
+            return Response({"message": "Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 
