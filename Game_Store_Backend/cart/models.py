@@ -89,7 +89,7 @@ class Order(models.Model):
     
     def add_item(self, item):
         cart_item = OrderItem(order=self,
-                            content_type=ContentType.objects.get_for_model(item),
+                            content_type= ContentType.objects.get_for_model(item),
                             object_id=item.id)
         cart_item.save()
         

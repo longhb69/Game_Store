@@ -86,6 +86,7 @@ class DLCImage(models.Model):
     def __str__(self):
         return f"{self.dlc.name} image" if self.dlc else self.image
     
+    
 class Game(Item,Slug):
     video = CloudinaryField(resource_type='video', null=True,blank=True)
     overview_description = models.TextField(null=True, blank=True)
@@ -103,6 +104,8 @@ class Game(Item,Slug):
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, null=True, blank=True)
     specialColor = models.CharField(max_length=20, null=True, blank=True)
     comments = GenericRelation('Comment', null=True, blank=True)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=3,default=0,null=True,blank=True)
     
     os_min = models.CharField(max_length=50, verbose_name='Minimum OS', null=True, blank=True)
     os_rec = models.CharField(max_length=50, verbose_name='Recommended OS', null=True, blank=True)
@@ -119,7 +122,17 @@ class Game(Item,Slug):
 
     def get_categories(self):
         return [[category.name,category.id] for category in self.category.all()]
-
+    
+    def apply_discount(self):
+        if self.discount_percentage:
+            discount_amount = self.price * (self.discount_percentage/100)
+            self.discounted_price = self.price - discount_amount
+        else:
+            self.discounted_price = 0
+    
+    def save(self, *args, **kwargs):
+        self.apply_discount()
+        super(Game, self).save(*args, **kwargs)
     
 class DLC(Item,Slug):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='dlcs')
@@ -182,32 +195,34 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"{self.user.username} comment on {self.product}"
+    
 
 
-class DecoratorManager(models.Manager):
-    def create(self, game, **kwargs):
-        kwargs.setdefault('name', game.get_Description())
-        kwargs.setdefault('price', game.get_cost())
+
+# class DecoratorManager(models.Manager):
+#     def create(self, game, **kwargs):
+#         kwargs.setdefault('name', game.get_Description())
+#         kwargs.setdefault('price', game.get_cost())
         
-        decorator_instance = super().create(game=game, **kwargs)
-        return decorator_instance
+#         decorator_instance = super().create(game=game, **kwargs)
+#         return decorator_instance
 
-class ProductDecorator(Item):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, default=None,related_name='game')
-    dlcs = models.ManyToManyField(DLC, blank=True,related_name='dlcs')
+# class ProductDecorator(Item):
+#     game = models.ForeignKey(Game, on_delete=models.CASCADE, default=None,related_name='game')
+#     dlcs = models.ManyToManyField(DLC, blank=True,related_name='dlcs')
     
-    objects = DecoratorManager()   
+#     objects = DecoratorManager()   
     
-    def add_dlc(self, dlc):
-        self.dlcs.add(dlc)
-        new_cost = self.price + dlc.get_cost()
-        self.set_cost(new_cost)
-        self.save()
-    def delete_dlc(self,dlc):
-        self.dlcs.remove(dlc)
-        new_cost = self.price - dlc.get_cost()
-        self.set_cost(new_cost)
-        self.save()
+#     def add_dlc(self, dlc):
+#         self.dlcs.add(dlc)
+#         new_cost = self.price + dlc.get_cost()
+#         self.set_cost(new_cost)
+#         self.save()
+#     def delete_dlc(self,dlc):
+#         self.dlcs.remove(dlc)
+#         new_cost = self.price - dlc.get_cost()
+#         self.set_cost(new_cost)
+#         self.save()
         
 # @receiver(post_save, sender=ProductDecorator)
 # def update_when_add_or_delete_product(sender,instance,*args,**kwargs):

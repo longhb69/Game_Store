@@ -9,8 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from .serializers import *
-from product.models import ProductDecorator,DLC,SpecialEditionGame,Game,ConcreteComponent,DLCDecorator
-from product.serializers import ProductDecoratorSerializer
+from product.models import DLC,SpecialEditionGame,Game,ConcreteComponent,DLCDecorator
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 import datetime
@@ -19,6 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from .command import RemoveFromOrderCommand,CreateOrderFromCartCommand, DeleteOrderCommand,CreateOrderCommand
 from .controller import CartController,OrderController
 from rest_framework.permissions import IsAuthenticated
+from account.models import Libary
 
 accessKey = "F8BBA842ECF85"
 secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz"
@@ -129,21 +129,32 @@ class Checkout(APIView):
     def post(self,request,*args, **kwargs):
         game_id = request.data.get('game_id')
         type = request.data.get('type')
+        from_cart = request.data.get('from_cart')
+        order_id = request.data.get('order_id')
         controller = OrderController()
         user = request.user
-        transaction_id = datetime.datetime.now().timestamp()
+        #transaction_id = datetime.datetime.now().timestamp()
         item_type = None
 
         if type == "game":
             item_type = ItemType.GAME
         elif type == "dlc":
             item_type = ItemType.DLC
-        try:
-            order = controller.execute(CreateOrderCommand(user=user, transaction_id=transaction_id,game_id=game_id,item_type=item_type))
-            serializers = OrderSerializer(order, many=False).data
-            return Response(serializers,status=status.HTTP_200_OK)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        
+        if(from_cart):
+            try:
+                order = controller.execute(CreateOrderFromCartCommand(user=user, transaction_id=order_id))
+                serializers = OrderSerializer(order, many=False).data
+                return Response(serializers, status=status.HTTP_200_OK)
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            try:
+                order = controller.execute(CreateOrderCommand(user=user, transaction_id=order_id,game_id=game_id,item_type=item_type))
+                serializers = OrderSerializer(order, many=False).data
+                return Response(serializers,status=status.HTTP_200_OK)
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         
 class Payment(APIView):
     def post(self, request):
@@ -151,7 +162,7 @@ class Payment(APIView):
         endpoint = "https://test-payment.momo.vn/v2/gateway/api/create"
         orderInfo = "pay with MoMo"
         partnerCode = "MOMO"
-        redirectUrl = "https://2412-2405-4802-3c4c-37b0-5a8-3b06-d4df-83ee.ngrok-free.app/payment"
+        redirectUrl = "https://b554-2405-4802-3c4c-37b0-a8ae-ebf2-9b5c-5cff.ngrok-free.app/cart/callback"
         ipnUrl = "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b"
         amount = request.data.get("amount")
         orderId = request.data.get("orderId")
@@ -211,16 +222,16 @@ class Callback(APIView):
             callback_data = request.query_params.dict()
             print(callback_data.get('resultCode'))
             print(callback_data.get('message'))
-            if callback_data.get('resultCode') == 0:
-                print('')
-                webhook_url = 'http://localhost:3000/webhook-order'
-                webhook_data = {
-                    'orderId': callback_data.get('orderId'),
-                    'message': callback_data.get('message')
-                } 
-                data = json.dumps(webhook_data)
-                clen = len(data)
-                response = requests.post(webhook_url, json=webhook_data)
+            if callback_data.get('resultCode') == "0":
+                order = Order.objects.get(transaction_id=callback_data.get('orderId'))
+                order.complete = True
+                user = User.objects.get(username="duc") 
+                library = Libary.objects.get(user=user)
+                order_items = OrderItem.objects.filter(order=order)
+                print("Get order items")
+                for item in order_items:
+                    library.add_libary_item(order=order, product=item)
+                order.save()
             return Response(callback_data, status=status.HTTP_200_OK)
         except:
             return Response({"error": "Failed to process callback"}, status=500)

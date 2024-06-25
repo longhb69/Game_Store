@@ -1,6 +1,6 @@
 from .serializers import UserSerializer, LibaryItemSerializer
-from .models import Libary, LibaryItem
-from product.models import Category
+from .models import Libary, LibaryItem, WishList, WishListItem
+from product.models import Category, Game
 from cart.models import Order
 from cart.serializers import OrderSerializer
 from rest_framework import status
@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework.pagination import PageNumberPagination
+from django.shortcuts import render
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -105,7 +106,10 @@ def register(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
+def test(request):
+    game = Game.objects.get(pk=41)
+    print(WishListItem.filter_by_product(game))
+    return render(request, "home/email_template.html")
 
             
         

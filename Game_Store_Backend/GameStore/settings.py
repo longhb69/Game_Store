@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-dxlu-b(=_mido_z*+xcn=+0_s&=%ifdbbvmcf3t4y1(kqcd#30
 DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.1.30','192.168.1.5','127.0.0.1','192.168.1.6','192.168.1.3','192.168.1.14', '192.168.1.37','192.168.1.6','172.26.176.1','192.168.1.4','192.168.1.38', '192.168.1.10', '192.168.1.24', '192.168.1.3',
-                 '192.168.1.7', '0763-2405-4802-3c4c-37b0-253d-6183-1544-df39.ngrok-free.app', '2412-2405-4802-3c4c-37b0-5a8-3b06-d4df-83ee.ngrok-free.app ']
+                 '192.168.1.7', 'b554-2405-4802-3c4c-37b0-a8ae-ebf2-9b5c-5cff.ngrok-free.app']
 
 
 # Application definition
@@ -86,18 +86,7 @@ CORS_ORIGIN_WHITELIST = (
 CSRF_TRUSTED_ORIGINS = ['http://192.168.1.4:3000']
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://192.168.1.45:3000",
-    "http://192.168.1.14:3000",
-    "http://192.168.1.6:3000",
-    "http://192.168.1.4:3000",
-    "http://192.168.1.10:3000",
-    "http://192.168.1.24:3000",
-    "http://192.168.1.3:3000",
-    "http://192.168.1.30:3000",
-    "http://192.168.1.7:3000",
-    "https://0763-2405-4802-3c4c-37b0-253d-6183-1544-df39.ngrok-free.app",
-    'https://0cc6-2405-4802-3c4c-37b0-5a8-3b06-d4df-83ee.ngrok-free.app',
-    'https://2412-2405-4802-3c4c-37b0-5a8-3b06-d4df-83ee.ngrok-free.app',
+    'https://b554-2405-4802-3c4c-37b0-a8ae-ebf2-9b5c-5cff.ngrok-free.app'
 ]
 
 ROOT_URLCONF = 'GameStore.urls'
@@ -168,6 +157,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -186,3 +179,14 @@ ALGOLIA = {
     'API_KEY': '04a1a1b4639f61d65975d70e215f429d',
     'INDEX_PREFIX': 'long'
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "thanhlongh124@gmail.com"
+EMAIL_HOST_PASSWORD = "swhh jcpw lnvr ixio"
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+

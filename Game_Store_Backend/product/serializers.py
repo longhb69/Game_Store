@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category,Game,DLC,SpecialEditionGame,ProductDecorator,GameImage, GameVideo, Developer, Publisher, Comment
+from .models import Category,Game,DLC,SpecialEditionGame,GameImage, GameVideo, Developer, Publisher, Comment
 
 class CategorySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
@@ -273,30 +273,30 @@ class SpecialEditionGameDetailSerializer(serializers.ModelSerializer):
             'dlcs',
         ]
     
-class ProductDecoratorSerializer(serializers.ModelSerializer):
-    game = GameSerializer()
-    dlc = DLCSerializer(many=True, read_only=True,source='dlcs')
-    class Meta:
-        model = ProductDecorator
-        fields = [
-            'id',
-            'game',
-            'dlc',
-        ]
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        game_data = {
-            key: representation['game'][key] for key in ['id', 'name', 'cover','slug', 'price', 'image'] 
-        }
-        transformed_representation = {
-            'id': representation['id'],
-            'game': {
-                "id": game_data["id"],
-                "name" : game_data["name"],
-                'cover': game_data["cover"],
-                "price": game_data["price"],
-            },
-            'dlc': representation['dlc']
-        }
-        return transformed_representation
+# class ProductDecoratorSerializer(serializers.ModelSerializer):
+#     game = GameSerializer()
+#     dlc = DLCSerializer(many=True, read_only=True,source='dlcs')
+#     class Meta:
+#         model = ProductDecorator
+#         fields = [
+#             'id',
+#             'game',
+#             'dlc',
+#         ]
+#     def to_representation(self, instance):
+#         representation = super().to_representation(instance)
+#         game_data = {
+#             key: representation['game'][key] for key in ['id', 'name', 'cover','slug', 'price', 'image'] 
+#         }
+#         transformed_representation = {
+#             'id': representation['id'],
+#             'game': {
+#                 "id": game_data["id"],
+#                 "name" : game_data["name"],
+#                 'cover': game_data["cover"],
+#                 "price": game_data["price"],
+#             },
+#             'dlc': representation['dlc']
+#         }
+#         return transformed_representation
     

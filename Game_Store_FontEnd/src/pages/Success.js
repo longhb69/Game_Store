@@ -37,8 +37,8 @@ export default function Success(props) {
                     </div>
                 </div>
             </div>
-            <div className="flex justify-center mt-5">
-                <div className="w-[560px] bg-[#fff]/[.2] p-5 rounded">
+            <div className="flex justify-center mt-5  h-screen">
+                <div className="w-[560px] bg-[#fff]/[.2] p-5 rounded h-fit">
                     <div className="mt-[30px] text-center">
                         <div className="">
                             <img

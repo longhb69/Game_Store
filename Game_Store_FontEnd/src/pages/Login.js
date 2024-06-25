@@ -93,7 +93,7 @@ export default function Login() {
         if (password.trim() === '') label2Ref.current.classList.remove('move-up')
     }
     return (
-        <div className="w-full h-[817px] login-container text-center">
+        <div className="w-full h-screen	login-container text-center">
             <div className="max-w-[550px] w-[500px] inline-block text-left align-middle bg-[#202020] mt-20 m-8 rounded">
                 <div className="text-center pb-[60px] pt-[50px] h-full px-[55px]">
                     <div className="text-center pb-[60px] pt-[50px] px-[45px] h-full">

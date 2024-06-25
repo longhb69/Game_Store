@@ -101,7 +101,9 @@ export default function GameDetail() {
             }
             addCartRef.current.classList.add('custom-loading')
             setTimeout(() => {
-                addCartRef.current.classList.remove('custom-loading')
+                if(addCartRef.current?.classList) {
+                    addCartRef.current.classList.remove('custom-loading')
+                }
                 getCartQuantity()
                 getItemInCart()
             }, 1000)
@@ -112,7 +114,7 @@ export default function GameDetail() {
         const add_on = game.dlc.map((dlc) => ({
             game_id: dlc.id,
         }))
-        const data = { type: 'game', base_game_id: game_id, add_on: add_on }
+        const data = { type: 'game', game_id: game_id, add_on: add_on }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -276,7 +278,7 @@ export default function GameDetail() {
                                                             )
                                                         })}
                                                     </div>
-                                                    {game.dlc.length > 5 ? (
+                                                    {game.dlc? (
                                                         <div className="flex flex-row ">
                                                             <div className="ml-auto">
                                                                 <div className="flex justify-end">
@@ -284,7 +286,7 @@ export default function GameDetail() {
                                                                         className={`flex ${
                                                                             showAllDLC ? 'mt-2 p-1 pl-3 rounded bg-[#202020]' : 'mt-2'
                                                                         } bg-[#202020] rounded`}>
-                                                                        {(game.dlc.length < 5 && game.dlc.length !== 1) || showAllDLC ? (
+                                                                        {(game.dlc) || showAllDLC ? (
                                                                             <>
                                                                                 <div className="flex items-center pl-3">
                                                                                     {totalDlcPrice}

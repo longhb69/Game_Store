@@ -9,8 +9,12 @@ import { v4 as uuidv4 } from 'uuid';
 export default function Checkout(props) {
     const [loggedIn, setLoggedIn] = useLogin();
     const [itemsInCart, setItemsInCart,getItemInCart, cartQuantity, setCartQuantity, getCartQuantity] = useCart();
+    const [orderId, setOrderId] = useState('')
     const navigate = useNavigate();
     const [account] = useAccount();
+    const intervalRef = useRef(null);
+    const duration = 5 * 60 * 1000;
+    const interval = 2000;
 
     const MoMoButtonRef = useRef(null);
 
@@ -26,23 +30,34 @@ export default function Checkout(props) {
                 navigate('/404')
             }
             else {
-                navigate(`/cart/success/${response.data.transaction_id}`);
+                //navigate(`/cart/success/${response.data.transaction_id}`);
                 getCartQuantity();
             }
         })
     }
-    const CheckoutFromCart = async (fromcart = true) => {
+    const CheckoutFromCart = async (from_cart = true) => {
         const orderId = uuidv4()
-        console.log('orderId', orderId)
-        if(fromcart) {
-            const url = baseUrl + 'cart/checkout_cart'
-            Checkout(url);
+        setOrderId(orderId)
+        const paymentUrl = baseUrl + 'cart/payment'
+        const paymentData = { amount:'1000', orderId: orderId }
+
+        if(from_cart) {
+            //const url = baseUrl + 'cart/checkout_cart'
+            const url = baseUrl + 'cart/checkout'
+            const data = {order_id: orderId, from_cart: true}
+            const response = await axios.post(paymentUrl, paymentData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' +  localStorage.getItem('access'),
+                }
+            })
+            if(response.data.resultCode === 0) {
+                window.open(response.data.payUrl)
+            }
+            Checkout(url, data);
         }
         else {
-            const paymentUrl = baseUrl + 'cart/payment'
             //const paymentData = { amount:props.game.price.replace(/,/g,'') }
-            const paymentData = { amount:'1000', orderId: orderId }
-            console.log(paymentData)
             const response = await axios.post(paymentUrl, paymentData, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,37 +68,43 @@ export default function Checkout(props) {
             if(response.data.resultCode === 0) {
                 window.open(response.data.payUrl)
             }
-            //const url = baseUrl + 'cart/checkout'
-            //const data = {type:props.type, game_id: props.game.id, }
-            //Checkout(url,data)
-            
+            const url = baseUrl + 'cart/checkout'
+            const data = {type:props.type, game_id: props.game.id, order_id: orderId, from_cart: false}
+            Checkout(url,data)
         }
     }
 
     useEffect(() => {
-        const handleWebhook = async () => {
-            const webhookUrl = 'http://localhost:8000/webhook-order';
+        const startTime = Date.now();
+        const endTime = startTime + duration;
 
-            try {
-                const response = await axios.post(webhookUrl);
-                const webhookData = response.data;
-
-                console.log('Webhook Received:', webhookData);
-
-                // Example: Update UI based on received webhook data
-                if (webhookData.event === 'checkout_success') {
-                    // Perform actions based on the event
-                    // e.g., navigate to success page or update UI
-                    // navigate(`/cart/success/${webhookData.orderId}`);
-                    // getCartQuantity();
-                }
-            } catch (error) {
-                console.error('Error receiving webhook:', error);
+        const postRequest = () => {
+            if(orderId !== '') {
+                const url = baseUrl + 'cart/transaction-status';
+                const data = { orderId: orderId };
+                axios.post(url, data)
+                .then(response => {
+                    if(response.data.resultCode === 0) {
+                        navigate(`/cart/success/${orderId}`)
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
             }
         };
 
-        handleWebhook();
-    }, [])
+        intervalRef.current = setInterval(() => {
+
+        if (Date.now() >= endTime) {
+            clearInterval(intervalRef.current);
+        } else {
+            postRequest();
+        }
+        }, interval);
+
+        return () => clearInterval(intervalRef.current);
+    }, [orderId])
 
     return (props.trigger ? (
         <>

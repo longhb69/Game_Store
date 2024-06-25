@@ -20,7 +20,6 @@ import Transactions from './components/Transactions'
 import Password from './components/Password'
 import ScrollToTop from './components/ScrollToTop'
 import Footer from './components/Footer'
-import Payment from './pages/Payment'
 export const UserContext = createContext()
 
 const MainRoutes = () => {
@@ -62,7 +61,6 @@ function App() {
                             </>
                         }
                     />
-                    <Route path="/payment" element={<Payment />} />
                 </Routes>
             </Router>
         </LoginProvider>

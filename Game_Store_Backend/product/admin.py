@@ -22,7 +22,7 @@ class GameAdmin(admin.ModelAdmin):
 admin.site.register(Category)
 admin.site.register(Game,GameAdmin)
 admin.site.register(DLC,DLCAdmin)
-admin.site.register(ProductDecorator,ProductDecoratorAdmin)
+#admin.site.register(ProductDecorator,ProductDecoratorAdmin)
 admin.site.register(SpecialEditionGame,SpecialEditionGameAdmin)
 admin.site.register(GameImage)
 admin.site.register(GameVideo)

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
+        .email-container {
+            margin: 0 auto;
+            width: fit-content;
+        }
+        .main-email-content {
+            background-color: #322D31;
+            padding: 60px;
+            width: 700px;
+        }
+        img {
+            max-width: 400px;
+        }
+        .image-container {
+            text-align: center;
+        }
+        .game-image {
+            border-radius: 4px;
+        }
+        .message {
+            color: #FE4893;
+            size: 22px;
+            font-weight: 700;
+        }
+        .button-container {
+            display: flex;
+            font-family: Arial, sans-serif, 'Motiva Sans';
+            text-align: center;
+            font-size: 18px;
+            line-height: 22px;
+            border-radius: 5px;
+            width: 250px;
+            height: 50px;
+            margin-top: 50px;
+            margin-left: auto;
+            margin-right: auto;
+            background: #fe4893;
+            text-decoration: none;
+        }
+        .discount-container {
+            background-color: #222032;
+            margin-top: 20px;
+            display: flex;
+            width: fit-content;
+            margin: 20px auto;
+            font-size: 1.2rem;
+        }
+        .space {
+            display: flex;
+            padding: 5px;
+            border-radius: 4px;
+            color: #fff;
+        }
+        .old-price {
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+        .percentage  {
+            background-color: #4C6B21;
+            color: #caff0b;
+            padding-right: 8px;
+            padding-left: 8px;
+            font-weight: 500;
+            display: flex;
+        }
+        .link {
+            display: block;
+            padding: 13px 10px;
+            text-decoration: none;
+            color: #000000;
+            text-align: center;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .username {
+            color: #fff;
+        }
+        .link-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="main-email-content">
+            <h1 class="username">Xin chào {{username}}!</h1>
+            <h1 class="message">GAME TRONG WISHLIST CỦA BẠN ĐANG ĐƯỢC GIẢM GIÁ!!</h1>
+            <div class="image-container">
+                <img class="game-image" src="https://res.cloudinary.com/dfo61m8dy/image/upload/v1707052405/mhlcfsbsgnspt2xjiomy.avif" alt="Game Image">
+            </div>
+            <div class="discount-container">
+                <div class="percentage" style="text-align: center; padding-top: 5px;">
+                    <p>-90%</p>
+                </div>
+                <div class="space">
+                    <div class="old-price">1.990.000₫</div>
+                    <div class="new_price">900.000₫</div>
+                </div>
+            </div>
+            <div class="link-container">
+                <div class="button-container"">
+                    <a class="link" href={{product_url}} target="_blank">
+                        <span class="button" style="color: #000000;">MUA NGAY</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

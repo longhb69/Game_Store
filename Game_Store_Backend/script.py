@@ -1,4 +1,5 @@
 from product.models import Game
+from account.models import *
 def run():
-    game = Game.objects.get(name = "Alan Wake 2")
-    print(game.name)
+    #game = WishListItem.objects.get(pk=1)
+    print("Hello world")

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import *
-from product.models import ProductDecorator,SpecialEditionGame,DLC,Game
-from product.serializers import ProductDecoratorSerializer,SpecialEditionGameSerializer,DLCSerializer,GameSerializer
+from product.models import SpecialEditionGame,DLC,Game
+from product.serializers import SpecialEditionGameSerializer,DLCSerializer,GameSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
     #product = serializers.SerializerMethodField(allow_null=True)
