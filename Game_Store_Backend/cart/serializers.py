@@ -60,10 +60,10 @@ class OrderItemSerializer(serializers.ModelSerializer):
             'item'
         ]
     def get_item(self, instance):
-        if isinstance(instance.product, Game):
-            return GameSerializer(instance.product).data
-        elif isinstance(instance.product, DLC):
-            return DLCSerializer(instance.product).data
+            if isinstance(instance.product, Game):
+                return GameSerializer(instance.product).data
+            elif isinstance(instance.product, DLC):
+                return DLCSerializer(instance.product).data
 
 class OrderSerializer(serializers.ModelSerializer):
     order = serializers.SerializerMethodField()

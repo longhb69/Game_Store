@@ -97,10 +97,19 @@ export default function SaleSection(props) {
                                                                         <span>Add to Cart</span>
                                                                     </div>
                                                                     <div className="flex h-[40px]">
-                                                                        <div className="m-1 mr-0 bg-[#000000]/[.1] px-3 py-2 text-[14px] items-center flex whitespace-nowrap">
+                                                                        {parseFloat(game.discounted_price) > 0 ? 
+                                                                            <div className='my-1 px-1 text-xs bg-[#4C6B21] rounded text-[#caff0b] flex items-center'>-{parseInt(game.discount_percentage)}%</div>
+                                                                        : null}
+                                                                        <div className={`my-1 mr-0 pl-1 bg-[#000000]/[.1] text-[14px] items-center flex whitespace-nowrap ${parseFloat(game.discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}>
                                                                             {game.price}
                                                                             <span className="underline">đ</span>
                                                                         </div>
+                                                                        {parseFloat(game.discounted_price) > 0 ? 
+                                                                            <div className='my-1 mr-2 pl-2 bg-[#000000]/[.1] text-[14px] items-center flex whitespace-nowrap'>
+                                                                                {game.discounted_price}
+                                                                                <span className="underline">đ</span>
+                                                                            </div>
+                                                                        : null}
                                                                     </div>
                                                                 </div>
                                                             </div>

@@ -30,6 +30,8 @@ class GameSerializer(serializers.ModelSerializer):
             'name',
             'slug',
             'price',
+            'discounted_price',
+            'discount_percentage',
             'image',
             'background',
             'hero',

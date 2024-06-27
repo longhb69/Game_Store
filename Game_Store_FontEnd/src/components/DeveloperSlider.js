@@ -127,13 +127,24 @@ export default function DeveloperSlider(props) {
                                                       </div>
                                                   </div>
                                                   <div className="relative pt-1.5 pb-6">
-                                                      <div className="hover-affect pl-2 text-sm">
-                                                          <div className="font-semibold overflow-hidden whitespace-nowrap text-overflow-ellipsis">
-                                                              {game.name}
-                                                          </div>
-                                                          <div className="leading-7">
-                                                              {game.price}
-                                                              <span className="underline">đ</span>
+                                                      <div className="hover-affect pl-1 text-sm">
+                                                            <div className="font-semibold overflow-hidden whitespace-nowrap text-overflow-ellipsis">
+                                                                {game.name}
+                                                            </div>    
+                                                            <div className='flex items-center gap-1'>
+                                                                {parseFloat(game.discounted_price) > 0 ? 
+                                                                        <div className='text-xs bg-[#4C6B21] px-0.5 py-0.5 rounded text-[#caff0b]'>-{parseInt(game.discount_percentage)}%</div>
+                                                                : null}
+                                                                <div className={`leading-7 ${parseFloat(game.discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}>
+                                                                    {game.price}
+                                                                    <span className="underline">đ</span>
+                                                                </div>
+                                                                {parseFloat(game.discounted_price) > 0 ? 
+                                                                    <p>
+                                                                        {game.discounted_price}
+                                                                        <span className="underline">đ</span>
+                                                                    </p>
+                                                                : null} 
                                                           </div>
                                                           <div className="text-sm text-[#838587]">{publisher}</div>
                                                       </div>

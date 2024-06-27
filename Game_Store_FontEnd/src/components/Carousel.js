@@ -116,12 +116,23 @@ export default function Carousel(props) {
                                                             </div>
                                                             <div className=''>
                                                                 <div className='text-lg font-medium'>
-                                                                    <span>
-                                                                        {game.price}<span className='underline'>đ</span>
-                                                                    </span>
+                                                                    <div className="flex items-center gap-3">
+                                                                        {parseFloat(game.discounted_price) > 0 ? 
+                                                                            <div className='text-base bg-[#4C6B21] px-1.5 py-0.5 rounded text-[#caff0b]'>-{parseInt(game.discount_percentage)}%</div>
+                                                                        : null}
+                                                                        <span className={`${parseFloat(game.discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}> 
+                                                                            {game.price}<span className='underline'>đ</span>
+                                                                        </span>
+                                                                        {parseFloat(game.discounted_price) > 0 ? 
+                                                                            <p>
+                                                                                {game.discounted_price}
+                                                                                <span className="underline">đ</span>
+                                                                            </p>
+                                                                        : null}
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div className='mt-2'>
+                                                            <div className='mt-4'>
                                                                 <div className='flex'>
                                                                     <Link to={`/app/${game.slug}`} className='mr-[10px] min-w-[120px] relative items-center text-[#000] h-[40px] w-auto bg-[#fff] justify-center text-center rounded-sm inline-flex rounded'>
                                                                         BUY NOW

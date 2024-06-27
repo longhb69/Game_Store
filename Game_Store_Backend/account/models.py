@@ -64,6 +64,19 @@ class WishList(models.Model):
 
     def __str__(self):
         return self.user.username + ' wishlist'
+    
+    def add_wishlist_item(self, product):
+        content_object = None
+        if(isinstance(product, Game)):
+            content_object = ContentType.objects.get_for_model(Game)
+        elif(isinstance(product, DLC)):
+            content_object = ContentType.objects.get_for_model(DLC)
+
+        wishlist_item = WishListItem.objects.create(
+            wishlist=self,
+            content_type = content_object,
+            object_id = product.id
+        )
 
 class WishListItemManager(models.Manager):
     def get_product(self, product):
@@ -71,7 +84,7 @@ class WishListItemManager(models.Manager):
         return self.filter(content_type=content_type, object_id=product.pk)
 
 class WishListItem(models.Model):
-    wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE)
+    wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE, related_name="wishlist_items")
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.PositiveIntegerField()
     product = GenericForeignKey('content_type', 'object_id')

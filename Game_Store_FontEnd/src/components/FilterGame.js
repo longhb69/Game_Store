@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-export default function FilterGame({slug, cover, name, price, type}) {
+export default function FilterGame({slug, cover, name, price, type, discounted_price, discount_percentage}) {
     const renderLink = () => {
         console.log(type)
         if(type === 'game') {
@@ -22,9 +22,20 @@ export default function FilterGame({slug, cover, name, price, type}) {
                         <div className="overflow-hidden mt-5">{name}</div>
                         <div className="flex items-center mt-1">
                             {price ? (
-                                <div>
-                                    {price}
-                                    <span className="underline">đ</span>
+                                <div className='flex gap-3 items-center'>
+                                    {parseFloat(discounted_price) > 0 ? 
+                                        <div className='text-base bg-[#4C6B21] px-1.5 py-0.5 rounded text-[#caff0b]'>-{parseInt(discount_percentage)}%</div>
+                                    : null}
+                                    <div className={`${parseFloat(discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}>
+                                        {price}
+                                        <span className="underline">đ</span>
+                                    </div>
+                                    {parseFloat(discounted_price) > 0 ? 
+                                        <p>
+                                            {discounted_price}
+                                            <span className="underline">đ</span>
+                                        </p>
+                                    : null}
                                 </div>
                             ) : null}
                         </div>

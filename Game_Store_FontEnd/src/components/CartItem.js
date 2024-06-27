@@ -1,10 +1,8 @@
 import { Link} from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { useLogin } from '../LoginContext';
 
 export default function CartItem(props) {
     return (
-        <div key={props.id} id={props.id} className='flex flex-row rounded bg-[#202020] wrapper-item'>
+        <div key={props.id} id={props.id} className='flex flex-row rounded bg-[#202020] wrapper-item px-[20px] py-[16px]'>
             <div className=''>
                 <Link to={props.type === 'game' ? '/app/'+props.slug : '/app/dlc/'+props.slug}>
                     <img className='min-w-[150px] h-[200px] rounded object-fit hover:brightness-125' src={props.cover}/>

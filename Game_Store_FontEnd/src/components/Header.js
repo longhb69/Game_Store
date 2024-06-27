@@ -247,7 +247,7 @@ export default function Header(props) {
                     <div className="flex items-center">
                         {loggedIn ? (
                             <>
-                                <div className="dropdown cursor-pointer relative">
+                                <div className="dropdown cursor-pointer relative mr-2">
                                     <p className="account-name text-xl text-[#fff] p-2 mr-2">{account}</p>
                                     <div className="friendly-box friendly-box-top"></div>
                                     <div className="friendly-box friendly-box-wide-adjust"></div>
@@ -270,6 +270,11 @@ export default function Header(props) {
                                 <div>
                                     <div>
                                         <li className="flex whitespace-nowrap items-center">
+                                            <div className='mr-2'>
+                                                <Link to={'/wishlist'} className="text-[#fff] hover:text-[#8F32db] text-xl flex items-center p-2">
+                                                    Wishlist
+                                                </Link>
+                                            </div>
                                             <div>
                                                 <Link to={'/cart'} className="text-[#fff] hover:text-[#8F32db] text-xl flex items-center p-2">
                                                     Cart

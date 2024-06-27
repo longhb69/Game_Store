@@ -1,7 +1,7 @@
-from .serializers import UserSerializer, LibaryItemSerializer
+from .serializers import UserSerializer, LibaryItemSerializer, WishListSerializer
 from .models import Libary, LibaryItem, WishList, WishListItem
-from product.models import Category, Game
-from cart.models import Order
+from product.models import Category, Game, DLC
+from cart.models import Order, ItemType
 from cart.serializers import OrderSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import render
+from django.http import JsonResponse
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -90,6 +91,51 @@ class TransactionsView(APIView):
         result_page = paginator.paginate_queryset(order, request)
         serializer = OrderSerializer(result_page, many=True).data
         return paginator.get_paginated_response(serializer)
+
+class WithListView(APIView):
+    def get(self, request):
+        #user = request.user
+        user = User.objects.get(username="duc")
+        wishlist = WishList.objects.get(user=user)
+        serializer = WishListSerializer(wishlist, many=False).data
+        return Response(serializer)
+    
+    def post(self, request, *args, **kwargs):
+        type = request.data.get('type')
+        game_id = request.data.get("game_id")
+        #user = request.user
+        user = User.objects.get(username="duc")
+        wishlist = get_object_or_404(WishList,user=user)
+
+        if type == ItemType.GAME.value:
+            product = get_object_or_404(Game, id=game_id)
+        if type == ItemType.DLC.value:
+            product = get_object_or_404(DLC, id=game_id)
+
+        try:
+            wishlist.add_wishlist_item(product=product)
+            return JsonResponse({'message': 'WishList item created successfully'}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, *args, **kwargs):
+        item_id = request.data.get('item_id')
+        print(item_id)
+        wishlist_item =  WishListItem.objects.get(pk=item_id)
+        wishlist_item.delete()
+
+        return JsonResponse({'message': 'Wishlist item delete'}, status=status.HTTP_200_OK)
+
+class ItemInWishList(APIView):
+    def get(self, request):
+        user = request.user
+        user = User.objects.get(username="duc")
+        wishlist = WishList.objects.get(user=user)
+        wishlist_items = WishListItem.objects.filter(wishlist=wishlist)
+        items_name = [item.product.slug for item in wishlist_items]
+        
+        return Response({'items_name': items_name}, status=status.HTTP_200_OK)
+        
 
 @api_view(['POST'])
 def register(request):

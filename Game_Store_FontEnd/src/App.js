@@ -20,6 +20,7 @@ import Transactions from './components/Transactions'
 import Password from './components/Password'
 import ScrollToTop from './components/ScrollToTop'
 import Footer from './components/Footer'
+import Wishlist from './pages/Wishlist'
 export const UserContext = createContext()
 
 const MainRoutes = () => {
@@ -31,6 +32,7 @@ const MainRoutes = () => {
             <Route path="/category/:slug" element={<CategoryGame />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/libary" element={<Library />} />
+            <Route path="/wishlist" element={<Wishlist/>} />
             <Route path="/cart/success/:id" element={<Success />} />
             <Route path="fillter/:slug" element={<FilterPage />} />
             <Route path="search/:q" element={<Search />} />

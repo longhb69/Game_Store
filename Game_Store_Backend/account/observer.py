@@ -40,7 +40,6 @@ class EmailObserver(Observer):
         new_price = kwargs.get('new_price')
         subject = "BIG SALES"
         from_email = settings.EMAIL_HOST_USER
-        discount_percentage = (game.discount_percentage/100)
         product_url = f"http://localhost:3000/app/{game.slug}"
 
 
@@ -53,7 +52,7 @@ class EmailObserver(Observer):
                                                                         'image_url': game.cover.url, 
                                                                         'previous_price': previous_price, 
                                                                         'new_price': new_price,
-                                                                        'discount_percentage': discount_percentage,
+                                                                        'discount_percentage': int(game.discount_percentage),
                                                                         'product_url': product_url})
             
             msg = EmailMultiAlternatives(subject,'',from_email,[observer.email])

@@ -26,6 +26,8 @@ export default function TopSellers() {
                                             price={game.price}
                                             image={game.image}
                                             cover={game.cover}
+                                            discounted_price={game.discounted_price}
+                                            discount_percentage={game.discount_percentage}
                                         />
                                     </div>
                                 </>

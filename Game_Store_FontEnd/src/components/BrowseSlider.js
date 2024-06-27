@@ -164,8 +164,19 @@ export default function MostPopular(props) {
                                                 </div>
                                                 <div className='md:text-base sm:text-[12px] flex flex-col font-normal'>
                                                     <div className='overflow-hidden mt-2'>{game.name}</div>
-                                                    <div className='flex items-center mt-1'>
-                                                        <div>{game.price}<span className="underline">đ</span></div>
+                                                    <div className='flex items-center gap-2'>
+                                                        {parseFloat(game.discounted_price) > 0 ? 
+                                                            <div className='text-sm bg-[#4C6B21] px-1 py-0.5 rounded text-[#caff0b]'>-{parseInt(game.discount_percentage)}%</div>
+                                                        : null}
+                                                        <div className={`flex items-center mt-1 ${parseFloat(game.discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}>
+                                                            <div>{game.price}<span className="underline">đ</span></div>
+                                                        </div>
+                                                        {parseFloat(game.discounted_price) > 0 ? 
+                                                            <p className='mt-1'>
+                                                                {game.discounted_price}
+                                                                <span className="underline">đ</span>
+                                                            </p>
+                                                        : null}
                                                     </div>
                                                 </div>
                                             </Link>

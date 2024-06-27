@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import reverse
-from .models import LibaryItem
+from .models import LibaryItem, WishList,WishListItem
 from django.contrib.auth.models import User
 from product.models import Game,DLC,SpecialEditionGame
 from product.serializers import GameSerializer, DLCSerializer
@@ -47,3 +47,35 @@ class LibaryItemSerializer(serializers.ModelSerializer):
             return "game"
         elif isinstance(instance.product, DLC):
             return "dlc"
+    
+class WishListItemSerializer(serializers.ModelSerializer):
+    item = serializers.SerializerMethodField(allow_null=True)
+    type = serializers.SerializerMethodField()
+    class Meta:
+        model = WishListItem
+        fields = [
+            'id',
+            'item',
+            'type',
+        ]
+    def get_item(self, instance):
+        if isinstance(instance.product, Game):
+            return GameSerializer(instance.product).data
+        elif isinstance(instance.product, DLC):
+            return DLCSerializer(instance.product).data 
+        
+    def get_type(self, instance):
+        if isinstance(instance.product, Game):
+            return "game"
+        elif isinstance(instance.product, DLC):
+            return "dlc"
+
+class WishListSerializer(serializers.ModelSerializer):
+    items = WishListItemSerializer(many=True, source='wishlist_items')
+    class Meta:
+        model = WishList
+        fields = [
+            'pk',
+            'user',
+            'items',
+        ]

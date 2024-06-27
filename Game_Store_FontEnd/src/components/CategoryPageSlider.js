@@ -81,12 +81,21 @@ export default function CategoryPageSlider(props) {
                                                         <img className="h-full w-full" src={game.cover} loading="lazy" />
                                                     </div>
                                                     <div className="bg-[#000] flex items-center">
-                                                        <span className="ml-auto flex">
+                                                        <span className="ml-auto flex items-center pr-1">
+                                                            {parseFloat(game.discounted_price) > 0 ? 
+                                                                <div className='text-base bg-[#4C6B21] px-1.5 py-0.5 rounded text-[#caff0b]'>-{parseInt(game.discount_percentage)}%</div>
+                                                            : null}
                                                             <div className="flex mt-1 h-[38px] whitespace-nowrap">
-                                                                <div className="text-lg px-2 py-0.5 text-[#32db55]">
+                                                                <div className={`text-lg px-2 py-0.5 ${parseFloat(game.discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}>
                                                                     {game.price}<span className='underline'>đ</span>
                                                                 </div>
                                                             </div>
+                                                            {parseFloat(game.discounted_price) > 0 ? 
+                                                                <p>
+                                                                    {game.discounted_price}
+                                                                    <span className="underline">đ</span>
+                                                                </p>
+                                                            : null}
                                                         </span>
                                                     </div>
                                                 </Link>

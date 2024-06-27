@@ -61,6 +61,7 @@
             padding: 5px;
             border-radius: 4px;
             color: #fff;
+            margin-left: 5px;
         }
         .old-price {
             text-decoration: line-through;
@@ -98,15 +99,15 @@
             <h1 class="username">Xin chào {{username}}!</h1>
             <h1 class="message">GAME TRONG WISHLIST CỦA BẠN ĐANG ĐƯỢC GIẢM GIÁ!!</h1>
             <div class="image-container">
-                <img class="game-image" src="https://res.cloudinary.com/dfo61m8dy/image/upload/v1707052405/mhlcfsbsgnspt2xjiomy.avif" alt="Game Image">
+                <img class="game-image" src={{image_url}} alt="Game Image">
             </div>
             <div class="discount-container">
                 <div class="percentage" style="text-align: center; padding-top: 5px;">
-                    <p>-90%</p>
+                    <p>-{{discount_percentage}}%</p>
                 </div>
                 <div class="space">
-                    <div class="old-price">1.990.000₫</div>
-                    <div class="new_price">900.000₫</div>
+                    <div class="old-price">{{previous_price}}₫</div>
+                    <div class="new_price">{{new_price}}₫</div>
                 </div>
             </div>
             <div class="link-container">

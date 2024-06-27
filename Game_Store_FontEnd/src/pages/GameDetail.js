@@ -27,9 +27,11 @@ export default function GameDetail() {
     const [specialColor, setSpecialColor] = useState('')
     const [itemsInCart, setItemsInCart, getItemInCart, cartQuantity, setCartQuantity, getCartQuantity] = useCart()
     const [account, setAccount, library, setLibrary, getLibrary] = useAccount()
+    const [itemsInWishList, setItemInWishList] = useState()
     const url = baseUrl + 'cart/'
     const addCartRef = useRef()
     const lottieRef = useRef()
+    const addWishlistRef = useRef()
     const [loading, setLoading] = useState(true)
     const loadingItems = Array.from({ length: 4 })
     //const originalBackgroundColor = window.getComputedStyle(document.body).backgroundColor;
@@ -64,6 +66,7 @@ export default function GameDetail() {
                 setLoading(false)
             })
         getItemInCart()
+        GetWishList()
         getLibrary()
     }, [])
 
@@ -78,6 +81,46 @@ export default function GameDetail() {
             document.querySelector('.header').style.background = originalBackgroundColor
         }
     }, [specialColor])
+
+    const GetWishList = async () => {
+        const url = baseUrl + 'api/account/game_in_wishlist'
+        const response = await axios.get(url, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('access'),
+            },
+        })
+        if(response.status === 200) {
+            setItemInWishList(response.data)
+        }
+    }
+
+    const addWishlist = async(game_id) => {
+        const data = {type: 'game', game_id:game_id}
+        const url = baseUrl + 'api/account/wishlist'
+        const response = await axios.post(url,data, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('access'),
+            },
+        })
+        if(response.status === 403 || response.status === 401) {
+            setLoggedIn(false)
+            navigate('/login', {
+                state: {
+                    previousUrl: location.pathname,
+                },
+            })
+        } else if (response.status === 201) {
+            addWishlistRef.current?.classList.add('custom-loading')
+            setTimeout(() => {
+                GetWishList()
+                if(addWishlistRef.current?.classList) {
+                    addWishlistRef.current.classList.remove('custom-loading')
+                }
+            }, 1000)
+        }   
+    }
 
     function addCart(game_id) {
         const data = { type: 'game', game_id: game_id }
@@ -390,11 +433,20 @@ export default function GameDetail() {
                                                     </div>
                                                 </div>
                                                 <div className="text-base md:text-sm flex flex-col">
-                                                    <div className="mt-1 text-lg">
-                                                        <p>
+                                                    <div className="mt-3 text-lg flex gap-3">
+                                                        {parseFloat(game.discounted_price) > 0 ? 
+                                                            <div className='text-base bg-[#4C6B21] px-1.5 py-0.5 rounded text-[#caff0b]'>-{parseInt(game.discount_percentage)}%</div>
+                                                        : null}
+                                                        <p className={`${parseFloat(game.discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}>
                                                             {game.price}
                                                             <span className="underline">đ</span>
                                                         </p>
+                                                        {parseFloat(game.discounted_price) > 0 ? 
+                                                            <p>
+                                                                {game.discounted_price}
+                                                                <span className="underline">đ</span>
+                                                            </p>
+                                                        : null}
                                                     </div>
                                                     {library && library.items_name.includes(game.slug) ? (
                                                         <div className="text-center rounded n bg-[#5532db] mt-3 opacity-[0.6] select-none">
@@ -411,14 +463,7 @@ export default function GameDetail() {
                                                             </div>
                                                             {itemsInCart && itemsInCart.items_name.includes(game.slug) ? (
                                                                 <div
-                                                                    ref={addCartRef}
                                                                     className="flex flex-col justify-items-center rounded border border-[245_245_245_0.6] mt-3 hover:bg-white/[.07] transition ease-out duration-[200ms] w-full max-h-[50px]">
-                                                                    <Lottie
-                                                                        className="lottie"
-                                                                        lottieRef={lottieRef}
-                                                                        animationData={animationData}
-                                                                        loop={true}
-                                                                    />
                                                                     <button
                                                                         className="p-3 w-full"
                                                                         onClick={(e) => {
@@ -448,11 +493,36 @@ export default function GameDetail() {
                                                                     </button>
                                                                 </div>
                                                             )}
-                                                            <div className="rounded border border-[245_245_245_0.6] mt-3 hover:bg-white/[.07] transition ease-out duration-[200ms]">
-                                                                <button className="p-3 w-full">
-                                                                    <span>ADD TO WISHLIST</span>
-                                                                </button>
-                                                            </div>
+                                                            {itemsInWishList && itemsInWishList.items_name.includes(game.slug) ? (
+                                                                <div
+                                                                    className="flex flex-col justify-center items-center rounded border border-[245_245_245_0.6] mt-3 hover:bg-white/[.07] transition ease-out duration-[200ms] w-full max-h-[40px]">
+                                                                    
+                                                                    <button
+                                                                        className="p-3 w-full"
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault()
+                                                                            navigate('/wishlist')
+                                                                        }}>
+                                                                        <span className="cart-text">IN WISHLIST</span>
+                                                                    </button>   
+                                                                </div>  
+                                                            ) : (
+                                                                <div ref={addWishlistRef} className="rounded border border-[245_245_245_0.6] mt-3 hover:bg-white/[.07] transition ease-out duration-[200ms] max-h-[46px]">
+                                                                    <Lottie
+                                                                        className="lottie"
+                                                                        lottieRef={lottieRef}
+                                                                        animationData={animationData}
+                                                                        loop={true}
+                                                                    />
+                                                                    <button className="p-3 w-full"
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault()
+                                                                            addWishlist(game.id)
+                                                                        }}>
+                                                                        <span className='cart-text'>ADD TO WISHLIST</span>
+                                                                    </button>
+                                                                </div>
+                                                            )}
                                                         </>
                                                     )}
                                                 </div>

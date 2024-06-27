@@ -47,7 +47,7 @@ export default function Home() {
         window.history.scrollRestoration = 'manual';
         window.scrollTo(0,0)
         const options = {
-            threshold: 0.6,
+            threshold: 0.0,
         }
         const observer = new IntersectionObserver(lazyLoadCallBack, options)
         lazyLoadRefs.forEach((ref) => {
@@ -89,15 +89,15 @@ export default function Home() {
             <div className="p-7 w-[75%] mx-auto">
                 <BrowseSlider url={PicksForYouUrl} title={'Picks for you'} linkable={false} slideperview={6} />
             </div>
-            <div className="section-load w-[75%] mx-auto mt-8 pb-4 min-h-[350px] developer-container rounded-xl border-2" style={{ backgroundImage: `url('${UbiBg}')` }}>
-                {loading[1] ? (
-                    <div ref={lazyLoadRefs[1]} className=" mx-auto flex justify-center my-10">
-                        <Lottie className="h-[60px] w-[60px]" animationData={animationData} loop={true} />
-                    </div>
-                ) : (
+            {loading[1] ? (
+                <div ref={lazyLoadRefs[1]} className=" mx-auto flex justify-center my-10">
+                    <Lottie className="h-[60px] w-[60px]" animationData={animationData} loop={true} />
+                </div>
+            ) : (
+                <div className="section-load w-[75%] mx-auto mt-8 pb-4 min-h-[350px] developer-container rounded-xl border-2" style={{ backgroundImage: `url('${UbiBg}')` }}>
                     <DeveloperSlider url={DeveloperUrl1} logo={Ubilogo} />
-                )}
-            </div>
+                </div>
+            )}
             {loading[1] ? (
                 <div ref={lazyLoadRefs[1]} className=" mx-auto flex justify-center my-10">
                     <Lottie className="h-[60px] w-[60px]" animationData={animationData} loop={true} />

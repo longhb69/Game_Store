@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
-export default function GameDeatail(props) {
+export default function GameDeatail({key, name, slug, price, image, cover, discounted_price, discount_percentage}) {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
@@ -21,18 +21,29 @@ export default function GameDeatail(props) {
                     </button>
                 </div>
 
-                <Link to={'/app/' + props.slug}>
+                <Link to={'/app/' + slug}>
                     <div className='h-full'>
                         <div className='flex flex-col h-full'>
                             <div className='block h-[77%] w-full mb-[10px] rounded relative'>
                                 <div className='w-full h-full rounded hover-affect'>
-                                        <img className="w-full h-full rounded" loading='lazy' src={props.cover}/>
+                                        <img className="w-full h-full rounded" loading='lazy' src={cover}/>
                                 </div>
                             </div>
-                            <div className='text-base flex flex-col font-normal grow shrink-0'>
-                                <div className='overflow-hidden'>{props.name}</div>
-                                <div className='flex items-center mt-1'>
-                                    <div>{props.price}<span className="underline">đ</span></div>
+                            <div className='text-base flex flex-col font-normal grow shrink-0 text-lg'>
+                                <div className='overflow-hidden'>{name}</div>
+                                <div className='flex items-center gap-2.5'>
+                                    {parseFloat(discounted_price) > 0 ? 
+                                        <div className='text-sm bg-[#4C6B21] px-1.5 py-0.5 rounded text-[#caff0b]'>-{parseInt(discount_percentage)}%</div>
+                                    : null}
+                                    <div className={`flex items-center mt-1 ${parseFloat(discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}>
+                                        <div>{price}<span className="underline">đ</span></div>
+                                    </div>
+                                    {parseFloat(discounted_price) > 0 ? 
+                                        <p className="mt-1">
+                                            {discounted_price}
+                                            <span className="underline">đ</span>
+                                        </p>
+                                    : null}
                                 </div>
                             </div>
                         </div>

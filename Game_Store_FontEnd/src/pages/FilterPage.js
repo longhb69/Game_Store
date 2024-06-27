@@ -36,7 +36,7 @@ export default function FilterPage() {
                                             return (
                                                 <li className="css-29 mb-[48px] basics-[25%] h-[400px] ml-4 mb-32">
                                                     <div className="max-h-[450px] h-[330px] w-[270px] max-w-[270px]">
-                                                        <FilterGame slug={game.slug} cover={game.cover} name={game.name} price={game.price} />
+                                                        <FilterGame slug={game.slug} cover={game.cover} name={game.name} price={game.price} discounted_price={game.discounted_price} discount_percentage={game.discount_percentage} />
                                                     </div>
                                                 </li>
                                             )
