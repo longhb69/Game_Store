@@ -177,6 +177,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     cover = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField()
+    discounted_price = serializers.SerializerMethodField()
     year = serializers.SerializerMethodField()
     developer = DeveloperSerializer()
     publisher = PublisherSerializer()
@@ -201,6 +202,10 @@ class GameDetailSerializer(serializers.ModelSerializer):
         return GameVideoSerializer(game_videos, many=True).data
     def get_price(self,instance):
         formatted_number = f'{instance.price:,.3f}'.replace(".",",")
+        return formatted_number
+    def get_discounted_price(self,instance):
+        formatted_number = f'{instance.discounted_price:,.3f}'.replace(".",",")
+        print(formatted_number)
         return formatted_number
     def get_year(self, instance):
         formatted_date = instance.year.strftime("%m/%d/%Y")

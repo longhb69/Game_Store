@@ -84,14 +84,16 @@ export default function GameDetail() {
 
     const GetWishList = async () => {
         const url = baseUrl + 'api/account/game_in_wishlist'
-        const response = await axios.get(url, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + localStorage.getItem('access'),
-            },
-        })
-        if(response.status === 200) {
-            setItemInWishList(response.data)
+        if(loggedIn) {
+            const response = await axios.get(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + localStorage.getItem('access'),
+                },
+            })
+            if(response.status === 200) {
+                setItemInWishList(response.data)
+            }
         }
     }
 

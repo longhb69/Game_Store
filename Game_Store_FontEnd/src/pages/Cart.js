@@ -76,7 +76,7 @@ export default function Cart() {
                             const updatedItems = prevCart.items.filter((item) => item.id !== item_id)
                             let newTotal = 0
                             updatedItems.forEach((element) => {
-                                newTotal += parseFloat(element.price.replace(/,/g, ''))
+                                newTotal += parseFloat(element.discounted_price) > 0 ? parseFloat(element.discounted_price.replace(/,/g, '')) : parseFloat(element.price.replace(/,/g, ''))
                             })
                             return {
                                 ...prevCart,
@@ -113,6 +113,8 @@ export default function Cart() {
                                             type={item.type}
                                             name={item.name}
                                             price={item.price}
+                                            discounted_price={item.discounted_price}
+                                            discount_percentage={item.discount_percentage}
                                             cover={item.cover}
                                             dlcs={item.dlcs}
                                             handleDelete={handleDelete}

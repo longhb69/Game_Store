@@ -85,26 +85,31 @@ class TransactionsView(APIView):
     def get(self, request):
         paginator = self.pagination_class()
         user = request.user
-        user = User.objects.get(username='long')
+        #user = User.objects.get(username='long')
         order = Order.objects.filter(user=user)
         serializer = OrderSerializer(order, many=True).data
         result_page = paginator.paginate_queryset(order, request)
         serializer = OrderSerializer(result_page, many=True).data
         return paginator.get_paginated_response(serializer)
 
+
+@permission_classes([IsAuthenticated])
 class WithListView(APIView):
     def get(self, request):
-        #user = request.user
-        user = User.objects.get(username="duc")
+        user = request.user
+        #user = User.objects.get(username="duc")
+        print("get wishlist")
+        print(user)
         wishlist = WishList.objects.get(user=user)
+        print("OK")
         serializer = WishListSerializer(wishlist, many=False).data
         return Response(serializer)
     
     def post(self, request, *args, **kwargs):
         type = request.data.get('type')
         game_id = request.data.get("game_id")
-        #user = request.user
-        user = User.objects.get(username="duc")
+        user = request.user
+        #user = User.objects.get(username="duc")
         wishlist = get_object_or_404(WishList,user=user)
 
         if type == ItemType.GAME.value:
@@ -129,7 +134,7 @@ class WithListView(APIView):
 class ItemInWishList(APIView):
     def get(self, request):
         user = request.user
-        user = User.objects.get(username="duc")
+        #user = User.objects.get(username="duc")
         wishlist = WishList.objects.get(user=user)
         wishlist_items = WishListItem.objects.filter(wishlist=wishlist)
         items_name = [item.product.slug for item in wishlist_items]

@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-dxlu-b(=_mido_z*+xcn=+0_s&=%ifdbbvmcf3t4y1(kqcd#30
 DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.1.30','192.168.1.5','127.0.0.1','192.168.1.6','192.168.1.3','192.168.1.14', '192.168.1.37','192.168.1.6','172.26.176.1','192.168.1.4','192.168.1.38', '192.168.1.10', '192.168.1.24', '192.168.1.3',
-                 '192.168.1.7', 'b554-2405-4802-3c4c-37b0-a8ae-ebf2-9b5c-5cff.ngrok-free.app']
+                 '192.168.1.7', '1b14-2405-4802-3c48-1d60-495b-115c-bc6e-797a.ngrok-free.app']
 
 
 # Application definition
@@ -86,7 +86,7 @@ CORS_ORIGIN_WHITELIST = (
 CSRF_TRUSTED_ORIGINS = ['http://192.168.1.4:3000']
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    'https://b554-2405-4802-3c4c-37b0-a8ae-ebf2-9b5c-5cff.ngrok-free.app'
+    'https://1b14-2405-4802-3c48-1d60-495b-115c-bc6e-797a.ngrok-free.app'
 ]
 
 ROOT_URLCONF = 'GameStore.urls'

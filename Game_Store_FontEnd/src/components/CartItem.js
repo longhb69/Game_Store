@@ -27,7 +27,20 @@ export default function CartItem(props) {
             <div className='ml-auto'>
                 <div className='text-right'>
                     <div className='text-lg'>
-                        {props.price}<span className='underline'>đ</span>
+                        <div className='flex gap-2'>
+                            {parseFloat(props.discounted_price) > 0 ? 
+                                <div className='text-base bg-[#4C6B21] px-1 py-0.5 rounded text-[#caff0b]'>-{parseInt(props.discount_percentage)}%</div>
+                            : null}
+                            <div className={`${parseFloat(props.discounted_price) > 0 ? 'line-through text-[#D0D0D0]' : ''}`}>
+                                {props.price}<span className='underline'>đ</span>
+                            </div>
+                            {parseFloat(props.discounted_price) > 0 ? 
+                                <p>
+                                    {props.discounted_price}
+                                    <span className="underline">đ</span>
+                                </p>
+                            : null}
+                        </div>
                     </div>
                     <div className='mt-2'>
                         <button className='text-gray-400 underline hover:no-underline'

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from product.models import DLC
+from product.models import DLC, Game
 from django.dispatch import receiver
 from django.db.models.signals import post_save,pre_save,post_delete
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -69,6 +69,11 @@ class CartItem(Item,Slug):
 
     def __str__(self):
         return super().__str__() + f" - {self.cart}"
+    
+    def get_discount(self):
+        if self.type == 'game':
+            game = Game.objects.filter(slug=self.slug).first()
+            return game.price * (game.discount_percentage/100)
     
     
 class Order(models.Model):
@@ -145,11 +150,13 @@ def add_price_cart_item(sender, instance, created, *args,**kwargs):
     cart_items = CartItem.objects.filter(cart=cart)
     if created:
         total_price = sum(cart_item.price for cart_item in cart_items)
-        cart.total_price = total_price 
+        total_discount_price = sum(cart_item.get_discount() for cart_item in cart_items)
+        cart.total_price = total_price - total_discount_price
         cart.save()
     else:
         total_price = sum(cart_item.price for cart_item in cart_items)
-        cart.total_price = total_price 
+        total_discount_price = sum(cart_item.get_discount() for cart_item in cart_items)
+        cart.total_price = total_price - total_discount_price
         cart.save()
         
 @receiver(post_delete, sender=CartItem)
@@ -157,7 +164,8 @@ def update_cart_total_price(sender, instance, **kwargs):
     cart = Cart.objects.get(id=instance.cart.id)
     cart_items = CartItem.objects.filter(cart=cart)
     total_price = sum(cart_item.price for cart_item in cart_items)
-    cart.total_price = total_price 
+    total_discount_price = sum(cart_item.get_discount() for cart_item in cart_items)
+    cart.total_price = total_price - total_discount_price
     cart.save()
 
 

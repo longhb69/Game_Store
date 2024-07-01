@@ -19,6 +19,7 @@ from .command import RemoveFromOrderCommand,CreateOrderFromCartCommand, DeleteOr
 from .controller import CartController,OrderController
 from rest_framework.permissions import IsAuthenticated
 from account.models import Libary
+from django.contrib.auth import get_user
 
 accessKey = "F8BBA842ECF85"
 secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz"
@@ -159,7 +160,7 @@ class Payment(APIView):
         endpoint = "https://test-payment.momo.vn/v2/gateway/api/create"
         orderInfo = "pay with MoMo"
         partnerCode = "MOMO"
-        redirectUrl = "https://b554-2405-4802-3c4c-37b0-a8ae-ebf2-9b5c-5cff.ngrok-free.app/cart/callback"
+        redirectUrl = "https://1b14-2405-4802-3c48-1d60-495b-115c-bc6e-797a.ngrok-free.app/cart/callback"
         ipnUrl = "https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b"
         amount = request.data.get("amount")
         orderId = request.data.get("orderId")
@@ -220,19 +221,23 @@ class Callback(APIView):
             print(callback_data.get('resultCode'))
             print(callback_data.get('message'))
             if callback_data.get('resultCode') == "0":
-                order = Order.objects.get(transaction_id=callback_data.get('orderId'))
-                order.complete = True
-                user = User.objects.get(username="duc") 
-                library = Libary.objects.get(user=user)
-                order_items = OrderItem.objects.filter(order=order)
-                print("Get order items")
-                for item in order_items:
-                    library.add_libary_item(order=order, product=item)
-                order.save()
+                # order = Order.objects.get(transaction_id=callback_data.get('orderId'))
+                # order.complete = True
+                # user =  request
+                # print(user)
+                # library = Libary.objects.get(user=user)
+                # order_items = OrderItem.objects.filter(order=order)
+                # print("Get order items")
+                # for item in order_items:
+                #     library.add_libary_item(order=order, product=item)
+                # order.save()
+                pass
             return Response(callback_data, status=status.HTTP_200_OK)
         except:
             return Response({"error": "Failed to process callback"}, status=500)
 
+
+@permission_classes([IsAuthenticated])
 class TransactionStatus(APIView):
     def post(self, request):
         orderId = request.data.get("orderId")
@@ -254,7 +259,18 @@ class TransactionStatus(APIView):
 
         try:
             response = requests.post(endpoint, data=data, headers={'Content-Type': 'application/json', 'Content-Length': str(clen)})
-            return Response(response.json(), status=status.HTTP_200_OK)
+            response_data  = response.json()
+            if(response_data.get('resultCode') == 0):
+                order = Order.objects.get(transaction_id=response_data.get('orderId'))
+                order_items = OrderItem.objects.filter(order=order)
+                order.complete = True
+                user =  request.user
+                library = Libary.objects.get(user=user)
+                order_items = OrderItem.objects.filter(order=order)
+                for item in order_items:
+                    library.add_libary_item(order=order, product=item)
+                order.save()
+            return Response(response_data, status=status.HTTP_200_OK)
         except:
             return Response({"message": "Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

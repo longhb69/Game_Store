@@ -41,19 +41,22 @@ class EmailObserver(Observer):
         subject = "BIG SALES"
         from_email = settings.EMAIL_HOST_USER
         product_url = f"http://localhost:3000/app/{game.slug}"
-
+        previous_price = "{:,.0f}".format(float(previous_price) * 1000)
+        new_price =  "{:,.0f}".format(float(new_price) * 1000)
 
         wishlist_items = WishListItem.filter_by_product(game)
         for item in wishlist_items:
             observer = item.wishlist.user
             print(f"Game Price Dropped! send email to {observer.email}")
 
-            html_content = render_to_string('home/email_template.html', {'username': observer.username, 
-                                                                        'image_url': game.cover.url, 
-                                                                        'previous_price': previous_price, 
-                                                                        'new_price': new_price,
-                                                                        'discount_percentage': int(game.discount_percentage),
-                                                                        'product_url': product_url})
+            html_content = render_to_string('home/email_template.html', {
+                'username': observer.username, 
+                'image_url': game.cover.url, 
+                'previous_price': previous_price, 
+                'new_price': new_price,
+                'discount_percentage': int(game.discount_percentage),
+                'product_url': product_url
+            })
             
             msg = EmailMultiAlternatives(subject,'',from_email,[observer.email])
             msg.attach_alternative(html_content, "text/html")

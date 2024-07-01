@@ -39,9 +39,9 @@ class TwelvePerPagePagination(PageNumberPagination):
 
 class NewFeaturedView(APIView):
     def get(self, request):
-        games = ['alan-wake-2', 'the-last-of-ustm-part-i','the-callisto-protocoltm','grand-theft-auto-v', 'red-dead-redemption-2','hogwarts-legacy']
+        games = ['helldiverstm-2', 'alan-wake-2', 'the-last-of-ustm-part-i','the-callisto-protocoltm', 'red-dead-redemption-2','hogwarts-legacy']
         try: 
-            newfeatured = Game.objects.filter(slug__in=games)
+            newfeatured = Game.objects.filter(slug__in=games).order_by('slug')
             serializer = GameSerializer(newfeatured, many=True).data
             return Response(serializer)
         except Game.DoesNotExist:

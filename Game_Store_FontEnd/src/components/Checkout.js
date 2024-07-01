@@ -82,7 +82,12 @@ export default function Checkout(props) {
             if(orderId !== '') {
                 const url = baseUrl + 'cart/transaction-status';
                 const data = { orderId: orderId };
-                axios.post(url, data)
+                axios.post(url, data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' +  localStorage.getItem('access'),
+                    }
+                })
                 .then(response => {
                     if(response.data.resultCode === 0) {
                         navigate(`/cart/success/${orderId}`)
@@ -162,7 +167,15 @@ export default function Checkout(props) {
                                                     </div>
                                                     <div className="ml-2 my-auto">
                                                         <div className="font-bold">{game.name}</div>
-                                                        <div className="text-sm">{game.price}<span className="underline">đ</span></div>
+                                                        <div className='flex gap-2'>
+                                                            <div className={`text-sm ${parseFloat(game.discounted_price) > 0 ? 'line-through' : ''}`}>{game.price}<span className="underline">đ</span></div>
+                                                            {parseFloat(game.discounted_price) > 0 ? 
+                                                                <p className='text-sm'>
+                                                                    {game.discounted_price}
+                                                                    <span className="underline">đ</span>
+                                                                </p>
+                                                            : null}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 {game.dlcs ? (
