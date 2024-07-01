@@ -38,21 +38,17 @@ class CreateOrderFromCartCommand:
         order = Order.objects.create(user=self.user, transaction_id=self.transaction_id)
         cart = Cart.objects.get(user=self.user)
         items = CartItem.objects.filter(cart=cart)
-        #libary = Libary.objects.get(user=self.user)
         for item in items:
             if item.type == ItemType.GAME.value:
                 game = Game.objects.get(slug=item.slug)
                 order.add_item(game)
-                #libary.add_libary_item(order=order, product=game)
 
                 for dlc in item.dlcs.all():
                     dlc = DLC.objects.get(slug=dlc.slug)
                     order.add_item(dlc)
-                    #libary.add_libary_item(order=order, product=dlc)
             elif item.type == ItemType.DLC.value:
                 game = DLC.objects.get(slug=item.slug)
                 order.add_item(game)
-                #libary.add_libary_item(order=order, product=game)
             else:
                 pass
         items.delete()
@@ -85,8 +81,6 @@ class CreateOrderCommand:
         except CartItem.DoesNotExist:
             print(f"CartItem '{item_slug} does not exist in user cart")
 
-        #libary = Libary.objects.get(user=self.user)
-        #libary.add_libary_item(order=order, product=item)
         return order
 
 @dataclass

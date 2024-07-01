@@ -133,28 +133,25 @@ class Checkout(APIView):
         order_id = request.data.get('order_id')
         controller = OrderController()
         user = request.user
-        #transaction_id = datetime.datetime.now().timestamp()
         item_type = None
 
         if type == "game":
             item_type = ItemType.GAME
         elif type == "dlc":
             item_type = ItemType.DLC
+
+        try:
+            if from_cart:
+                command = CreateOrderFromCartCommand(user=user, transaction_id=order_id)
+            else:
+                command = CreateOrderCommand(user=user, transaction_id=order_id,game_id=game_id,item_type=item_type)
+            
+            order = controller.execute(command)
+            serializers = OrderSerializer(order, many=False).data
+            return Response(serializers, status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-        if(from_cart):
-            try:
-                order = controller.execute(CreateOrderFromCartCommand(user=user, transaction_id=order_id))
-                serializers = OrderSerializer(order, many=False).data
-                return Response(serializers, status=status.HTTP_200_OK)
-            except Exception as e:
-                return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            try:
-                order = controller.execute(CreateOrderCommand(user=user, transaction_id=order_id,game_id=game_id,item_type=item_type))
-                serializers = OrderSerializer(order, many=False).data
-                return Response(serializers,status=status.HTTP_200_OK)
-            except Exception as e:
-                return JsonResponse({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         
 class Payment(APIView):
     def post(self, request):
